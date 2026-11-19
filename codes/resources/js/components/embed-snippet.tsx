@@ -1,6 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
-import { Check, Copy } from 'lucide-react';
+import CopyButton from '@/components/copy-button';
 
 interface EmbedSnippetProps {
     publicId: string;
@@ -11,7 +9,6 @@ function buildEmbedSnippet(origin: string, publicId: string): string {
 }
 
 export default function EmbedSnippet({ publicId }: EmbedSnippetProps) {
-    const { copied, copy } = useCopyToClipboard();
     const snippet = buildEmbedSnippet(window.location.origin, publicId);
 
     return (
@@ -19,10 +16,7 @@ export default function EmbedSnippet({ publicId }: EmbedSnippetProps) {
             <pre className="bg-muted overflow-x-auto rounded-md border p-3 text-xs break-all whitespace-pre-wrap">
                 <code>{snippet}</code>
             </pre>
-            <Button type="button" variant="outline" size="sm" onClick={() => void copy(snippet)}>
-                {copied ? <Check /> : <Copy />}
-                {copied ? 'Copied' : 'Copy'}
-            </Button>
+            <CopyButton text={snippet} />
         </div>
     );
 }

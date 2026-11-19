@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { useClipboard } from '@/hooks/use-clipboard';
+import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 import { Check, Copy } from 'lucide-react';
 
 interface CopyButtonProps {
@@ -8,7 +8,7 @@ interface CopyButtonProps {
 }
 
 export default function CopyButton({ text, label = 'Copy' }: CopyButtonProps) {
-    const { copied, copy } = useClipboard();
+    const { copied, copy } = useCopyToClipboard();
 
     return (
         <Button type="button" variant="outline" size="sm" onClick={() => void copy(text)}>

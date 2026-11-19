@@ -1,4 +1,4 @@
-import StarRating from '@/components/embed/star-rating';
+import StarRating from '@/components/star-rating';
 import { type EmbedTestimonial } from '@/types';
 
 interface EmbedTestimonialCardProps {
@@ -11,7 +11,7 @@ export default function EmbedTestimonialCard({ testimonial, cardClassName }: Emb
 
     return (
         <figure className={`flex flex-col gap-3 rounded-xl border p-5 ${cardClassName}`}>
-            {testimonial.rating !== null && <StarRating rating={testimonial.rating} />}
+            {testimonial.rating !== null && <StarRating value={testimonial.rating} className="text-amber-400" />}
             <blockquote className="text-sm leading-relaxed whitespace-pre-line">{testimonial.body}</blockquote>
             <figcaption className="mt-auto flex items-center gap-3">
                 {testimonial.photo_url && <img src={testimonial.photo_url} alt="" className="size-10 rounded-full object-cover" loading="lazy" />}
