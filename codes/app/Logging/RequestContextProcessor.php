@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Logging;
 
 use App\Support\Logging\RequestContext;
+use App\Support\Logging\Scrub;
 use Illuminate\Support\Facades\Auth;
 use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
@@ -27,7 +28,7 @@ final readonly class RequestContextProcessor implements ProcessorInterface
             'trace_id' => $this->context->traceId,
             'ip' => $this->context->ip,
             'method' => $this->context->method,
-            'path' => $this->context->path,
+            'path' => $this->context->path === null ? null : Scrub::path($this->context->path),
             'client' => $this->context->client?->toArray(),
             'duration_ms' => $this->context->elapsedMs(),
         ];

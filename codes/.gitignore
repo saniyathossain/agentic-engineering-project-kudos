@@ -24,3 +24,5 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 .setup.lock
+/public/status/lang.json
+/lang/.lang.lock

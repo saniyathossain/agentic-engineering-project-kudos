@@ -40,6 +40,8 @@ return [
 
     'stripe' => [
         'pro_price_id' => env('STRIPE_PRO_PRICE_ID', ''),
+        'timeout_s' => (int) env('STRIPE_TIMEOUT_S', 10),
+        'connect_timeout_s' => (int) env('STRIPE_CONNECT_TIMEOUT_S', 3),
     ],
 
 ];

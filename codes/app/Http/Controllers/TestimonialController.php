@@ -19,7 +19,7 @@ final class TestimonialController extends Controller
         Gate::authorize('manage', $testimonial);
         $actions->editBody($testimonial, $request->body());
 
-        return back()->with('success', 'Testimonial updated.');
+        return back()->with('success', __('flash.testimonial.updated'));
     }
 
     public function status(SetStatusRequest $request, Testimonial $testimonial, UpdateTestimonial $actions): RedirectResponse
@@ -27,7 +27,7 @@ final class TestimonialController extends Controller
         Gate::authorize('manage', $testimonial);
         $actions->setStatus($testimonial, $request->status());
 
-        return back()->with('success', 'Status changed to '.$request->status()->value.'.');
+        return back()->with('success', __('flash.testimonial.status', ['status' => __('enum.status.'.$request->status()->value)]));
     }
 
     public function favorite(Testimonial $testimonial, UpdateTestimonial $actions): RedirectResponse
@@ -43,6 +43,6 @@ final class TestimonialController extends Controller
         Gate::authorize('manage', $testimonial);
         $delete->handle($testimonial);
 
-        return back()->with('success', 'Testimonial deleted.');
+        return back()->with('success', __('flash.testimonial.deleted'));
     }
 }

@@ -6,13 +6,15 @@ namespace App\Http\Controllers;
 
 use App\Actions\Billing\BuildBillingOverview;
 use App\Contracts\BillingGateway;
+use App\Enums\Plan;
+use App\Exceptions\BillingNotConfigured;
+use App\Exceptions\BillingUnavailable;
 use App\Models\User;
 use App\Services\PlanResolver;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use RuntimeException;
 
 final class BillingController extends Controller
 {
@@ -26,14 +28,16 @@ final class BillingController extends Controller
     public function checkout(Request $request, BillingGateway $gateway, PlanResolver $plans): mixed
     {
         $user = $this->user($request);
-        if ($plans->for($user)->value === 'pro') {
-            return to_route('billing.show')->with('success', 'You are already on the Pro plan.');
+        if ($plans->for($user) === Plan::Pro) {
+            return to_route('billing.show')->with('success', __('billing.already_pro'));
         }
 
         try {
             $url = $gateway->checkoutUrl($user, route('billing.success'), route('billing.show'));
-        } catch (RuntimeException $e) {
-            return to_route('billing.show')->with('error', 'Billing is not configured yet: '.$e->getMessage());
+        } catch (BillingUnavailable $e) {
+            return to_route('billing.show')->with('error', $e->getMessage());
+        } catch (BillingNotConfigured $e) {
+            return to_route('billing.show')->with('error', $e->getMessage());
         }
 
         return Inertia::location($url);
@@ -45,13 +49,17 @@ final class BillingController extends Controller
         $user = $this->user($request);
         $sessionId = (string) $request->query('session_id');
 
-        if ($sessionId === '' || ! $gateway->isCheckoutCompleteFor($user, $sessionId)) {
-            return to_route('billing.show')->with('error', 'We could not confirm that payment.');
+        try {
+            $confirmed = $sessionId !== '' && $gateway->isCheckoutCompleteFor($user, $sessionId);
+        } catch (BillingUnavailable $e) {
+            return to_route('billing.show')->with('error', $e->getMessage());
         }
 
-        $message = $plans->for($user)->value === 'pro'
-            ? 'Welcome to Pro! Your upgrade is active.'
-            : 'Payment confirmed. Your Pro plan activates as soon as Stripe notifies us (usually seconds) - refresh this page.';
+        if (! $confirmed) {
+            return to_route('billing.show')->with('error', __('billing.confirm_failed'));
+        }
+
+        $message = $plans->for($user) === Plan::Pro ? __('billing.upgrade_active') : __('billing.payment_confirmed');
 
         return to_route('billing.show')->with('success', $message);
     }
@@ -60,10 +68,14 @@ final class BillingController extends Controller
     {
         $user = $this->user($request);
         if (! $user->hasStripeId()) {
-            return to_route('billing.show')->with('error', 'No billing profile yet.');
+            return to_route('billing.show')->with('error', __('billing.no_profile'));
         }
 
-        return Inertia::location($gateway->portalUrl($user, route('billing.show')));
+        try {
+            return Inertia::location($gateway->portalUrl($user, route('billing.show')));
+        } catch (BillingUnavailable $e) {
+            return to_route('billing.show')->with('error', $e->getMessage());
+        }
     }
 
     private function user(Request $request): User

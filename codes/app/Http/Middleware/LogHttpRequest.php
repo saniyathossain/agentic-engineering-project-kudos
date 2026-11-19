@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Enums\AccessLogMode;
+use App\Enums\Outcome;
 use App\Support\Logging\RequestContext;
+use App\Support\Logging\Scrub;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -24,8 +27,8 @@ final readonly class LogHttpRequest
 
     public function terminate(Request $request, Response $response): void
     {
-        $mode = (string) config('observability.access.mode');
-        if ($mode === 'off' || $request->is(...(array) config('observability.access.skip'))) {
+        $mode = AccessLogMode::fromConfig();
+        if ($mode === AccessLogMode::Off || $request->is(...(array) config('observability.access.skip'))) {
             return;
         }
 
@@ -33,31 +36,23 @@ final readonly class LogHttpRequest
         $duration = $this->context->elapsedMs();
         $slow = $duration >= (int) config('observability.access.slow_ms');
 
-        if ($mode === 'errors' && $status < 400 && ! $slow) {
+        if ($mode === AccessLogMode::Errors && $status < 400 && ! $slow) {
             return;
         }
 
         $context = array_filter([
             'event' => 'http.request',
             'status' => $status,
-            'outcome' => $this->outcome($status),
+            'outcome' => Outcome::forStatus($status)->value,
             'duration_ms' => $duration,
             'reason' => $slow ? 'slow' : null,
             'bytes' => strlen((string) $response->getContent()) ?: null,
             'query_keys' => $request->query() === [] ? null : array_keys($request->query()),
-            'referer' => $request->headers->get('referer') === null ? null : mb_substr((string) $request->headers->get('referer'), 0, 200),
+            // the referring page's path only: its query string and any token in it must never be logged
+            'referer' => $request->headers->get('referer') === null ? null : mb_substr(Scrub::path((string) $request->headers->get('referer')), 0, 200),
         ], static fn (mixed $v): bool => $v !== null);
 
         Log::log($this->level($status, $slow), 'http', $context);
-    }
-
-    private function outcome(int $status): string
-    {
-        return match (true) {
-            $status >= 500 => 'failed',
-            $status >= 400 => 'refused',
-            default => 'ok',
-        };
     }
 
     private function level(int $status, bool $slow): string

@@ -13,9 +13,9 @@ enum SpaceTheme: string
     public function label(): string
     {
         return match ($this) {
-            self::Light => 'Light',
-            self::Dark => 'Dark',
-            self::Brand => 'Brand',
+            self::Light => __('enum.theme.light'),
+            self::Dark => __('enum.theme.dark'),
+            self::Brand => __('enum.theme.brand'),
         };
     }
 }

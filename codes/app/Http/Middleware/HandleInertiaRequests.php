@@ -7,7 +7,9 @@ namespace App\Http\Middleware;
 use App\Services\PlanResolver;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Middleware;
+use Throwable;
 
 final class HandleInertiaRequests extends Middleware
 {
@@ -48,6 +50,8 @@ final class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'locale' => app()->getLocale(),
+            'resilience' => config('resilience.outage'),
             'plan' => fn (): ?array => $this->planFor($request),
             'flash' => [
                 'success' => fn (): ?string => $request->session()->get('success'),
@@ -64,7 +68,14 @@ final class HandleInertiaRequests extends Middleware
             return null;
         }
 
-        $plan = app(PlanResolver::class)->for($user);
+        try {
+            $plan = app(PlanResolver::class)->for($user);
+        } catch (Throwable $e) {
+            // a flaky dependency must not take the whole page down just to render a badge, but the outage stays visible
+            Log::warning('plan badge unavailable', ['event' => 'plan.lookup', 'outcome' => 'degraded', 'reason' => 'dependency_unavailable', 'error' => $e->getMessage()]);
+
+            return null;
+        }
 
         return ['value' => $plan->value, 'label' => $plan->label()];
     }

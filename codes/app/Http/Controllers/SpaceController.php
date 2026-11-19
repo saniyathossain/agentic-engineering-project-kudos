@@ -58,7 +58,7 @@ final class SpaceController extends Controller
             return to_route('billing.show')->with('error', $e->getMessage());
         }
 
-        return to_route('spaces.show', $space)->with('success', 'Space created. Share its link to collect testimonials.');
+        return to_route('spaces.show', $space)->with('success', __('flash.space.created'));
     }
 
     public function show(InboxRequest $request, Space $space): Response
@@ -101,7 +101,7 @@ final class SpaceController extends Controller
         Gate::authorize('manage', $space);
         $updateSpace->handle($space, $request->toData());
 
-        return to_route('spaces.show', $space)->with('success', 'Space updated.');
+        return to_route('spaces.show', $space)->with('success', __('flash.space.updated'));
     }
 
     public function destroy(Space $space, DeleteSpace $deleteSpace): RedirectResponse
@@ -109,7 +109,7 @@ final class SpaceController extends Controller
         Gate::authorize('manage', $space);
         $deleteSpace->handle($space);
 
-        return to_route('spaces.index')->with('success', 'Space deleted.');
+        return to_route('spaces.index')->with('success', __('flash.space.deleted'));
     }
 
     /** @return array<string, int> */

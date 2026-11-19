@@ -12,11 +12,11 @@ final class AllowEmbedding
 {
     public function handle(Request $request, Closure $next): Response
     {
-        /** @var Response $response */
-        $response = $next($request);
+        // SecurityHeaders (global) turns this flag into `frame-ancestors *` in the one Content-Security-Policy
+        $request->attributes->set(SecurityHeaders::EMBEDDABLE, true);
 
+        $response = $next($request);
         $response->headers->remove('X-Frame-Options');
-        $response->headers->set('Content-Security-Policy', 'frame-ancestors *');
 
         return $response;
     }

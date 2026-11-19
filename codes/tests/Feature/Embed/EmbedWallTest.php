@@ -45,12 +45,13 @@ final class EmbedWallTest extends TestCase
 
     public function test_wall_allows_framing(): void
     {
+        config(['security.csp.enabled' => true]);
         $space = Space::factory()->create();
 
         $response = $this->withHeaders([])->get("/embed/{$space->public_id}")->assertOk();
 
         $this->assertFalse($response->headers->has('X-Frame-Options'));
-        $this->assertSame('frame-ancestors *', $response->headers->get('Content-Security-Policy'));
+        $this->assertStringContainsString('frame-ancestors *', (string) $response->headers->get('Content-Security-Policy'));
     }
 
     public function test_unknown_space_returns_404(): void
@@ -62,6 +63,7 @@ final class EmbedWallTest extends TestCase
     public function test_json_feed_has_only_published_and_no_email(): void
     {
         $space = Space::factory()->create();
+        config(['security.csp.enabled' => true]);
         Testimonial::factory()->for($space)->published()->create([
             'respondent_email' => 'secret@example.test',
             'photo_path' => 'photos/a.jpg',
@@ -76,6 +78,6 @@ final class EmbedWallTest extends TestCase
         $this->assertStringNotContainsString('secret@example.test', (string) $response->getContent());
         $this->assertStringNotContainsString('respondent_email', (string) $response->getContent());
         $this->assertStringEndsWith('/storage/photos/a.jpg', (string) $response->json('data.0.photo_url'));
-        $this->assertSame('frame-ancestors *', $response->headers->get('Content-Security-Policy'));
+        $this->assertStringContainsString('frame-ancestors *', (string) $response->headers->get('Content-Security-Policy'));
     }
 }

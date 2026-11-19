@@ -10,11 +10,11 @@ final class PlanLimitReached extends RuntimeException
 {
     public static function spaces(): self
     {
-        return new self('Your Free plan includes 1 space. Upgrade to Pro to create more.');
+        return new self(__('limits.spaces'));
     }
 
     public static function testimonials(): self
     {
-        return new self('This space is not accepting testimonials right now.');
+        return new self(__('limits.testimonials'));
     }
 }

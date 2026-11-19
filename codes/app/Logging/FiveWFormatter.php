@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Logging;
 
+use App\Support\Logging\Scrub;
+use Illuminate\Database\QueryException;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Level;
 use Monolog\LogRecord;
@@ -109,7 +111,7 @@ final readonly class FiveWFormatter implements FormatterInterface
             'outcome' => $outcome,
             'status' => $context['status'] ?? null,
             'bytes' => $context['bytes'] ?? null,
-            'error' => isset($context['error']) ? $this->limit((string) $context['error']) : ($exception?->getMessage() === null ? null : $this->limit($exception->getMessage())),
+            'error' => isset($context['error']) ? $this->limit((string) $context['error']) : ($exception === null ? null : $this->limit($this->message($exception))),
             'exception' => $exception === null ? null : $this->exception($exception),
         ], static fn (mixed $v): bool => $v !== null);
     }
@@ -164,10 +166,10 @@ final readonly class FiveWFormatter implements FormatterInterface
 
         return array_filter([
             'class' => $e::class,
-            'message' => $this->limit($e->getMessage()),
+            'message' => $this->limit($this->message($e)),
             'code' => $e->getCode() === 0 ? null : $e->getCode(),
             'file' => $this->relative($e->getFile()).':'.$e->getLine(),
-            'previous' => $previous === null ? null : $previous::class.': '.$this->limit($previous->getMessage()),
+            'previous' => $previous === null ? null : $previous::class.': '.$this->limit($this->message($previous)),
             'trace' => $trace,
         ], static fn (mixed $v): bool => $v !== null);
     }
@@ -215,9 +217,21 @@ final readonly class FiveWFormatter implements FormatterInterface
         return str_starts_with($path, base_path()) ? ltrim(substr($path, strlen(base_path())), '/') : $path;
     }
 
+    /** A QueryException message embeds the full SQL with its bound values; the driver's own message is enough. */
+    private function message(Throwable $e): string
+    {
+        if ($e instanceof QueryException) {
+            return $e->getPrevious()?->getMessage() ?? 'Database query failed';
+        }
+
+        return $e->getMessage();
+    }
+
+    /** Scrubs secrets and personal data out of free text, then bounds its length. */
     private function limit(string $text): string
     {
         $max = (int) config('observability.message_limit', 2000);
+        $text = Scrub::text($text);
 
         return mb_strlen($text) > $max ? mb_substr($text, 0, $max).'…' : $text;
     }

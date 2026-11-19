@@ -27,6 +27,6 @@ enum Plan: string
 
     public function label(): string
     {
-        return ucfirst($this->value);
+        return __('enum.plan.'.$this->value);
     }
 }

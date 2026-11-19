@@ -32,6 +32,6 @@ final class PublicSpaceController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        return back()->with('success', 'Thank you! Your testimonial was sent.');
+        return back()->with('success', __('flash.submission.thanks'));
     }
 }

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="robots" content="noindex">
+    <title>Unavailable</title>
+    <link rel="stylesheet" href="/status/status.css">
+    <script src="/status/status.js"></script>
+</head>
+<body>
+    <!-- Served by the edge (nginx) with status 503 when the app does not answer. Words come from /status/lang.json. -->
+    <main class="card" role="alert" data-poll data-return="/">
+        <span class="chip-icon pulse" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M12 19.5h.01M3 3l18 18"/></svg>
+        </span>
+        <h1 data-i18n="outage.title">Unavailable</h1>
+        <p data-i18n="outage.why"></p>
+        <div class="rows">
+            <div class="row" data-row="connection" data-up="checking"><span data-i18n="outage.row.connection">Your connection</span><span class="state">…</span></div>
+            <div class="row" data-row="edge" data-up="true"><span data-i18n="outage.row.edge">Edge</span><span class="state">…</span></div>
+            <div class="row" data-row="app" data-up="false"><span data-i18n="outage.row.app">App</span><span class="state">…</span></div>
+        </div>
+        <div class="facts">
+            <span><span data-i18n="outage.down_for">Down for</span> <b data-down-for>0 s</b></span>
+            <span><span data-i18n="outage.checks">Checks</span> <b data-checks>0</b></span>
+            <span data-next></span>
+        </div>
+        <div class="actions">
+            <button class="btn primary" type="button" data-check-now><span data-i18n="status.action.retry">Try again</span></button>
+        </div>
+    </main>
+</body>
+</html>

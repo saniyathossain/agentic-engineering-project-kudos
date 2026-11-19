@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 final class SlugGenerator
 {
     /** Slugs that would collide with application routes. */
-    private const RESERVED = ['login', 'register', 'dashboard', 'settings', 'embed', 'billing', 'spaces', 'stripe', 'up', 'forgot-password', 'reset-password', 'verify-email', 'confirm-password', 'logout', 'email'];
+    public const RESERVED = ['login', 'register', 'dashboard', 'settings', 'embed', 'billing', 'spaces', 'stripe', 'up', 'livez', 'readyz', 'healthz', 'status', 'outage', 'client-logs', 'forgot-password', 'reset-password', 'verify-email', 'confirm-password', 'logout', 'email', 'testimonials', 'build', 'storage'];
 
     public function unique(string $name, ?int $ignoreSpaceId = null): string
     {
