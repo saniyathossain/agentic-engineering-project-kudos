@@ -6,13 +6,16 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Cashier\Billable;
 
 final class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
+    use Billable;
     use Notifiable;
 
     /**
@@ -45,7 +48,14 @@ final class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'banner_dismissed_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /** @return HasMany<Space, $this> */
+    public function spaces(): HasMany
+    {
+        return $this->hasMany(Space::class);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Services\PlanResolver;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -47,6 +48,23 @@ final class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'plan' => fn (): ?array => $this->planFor($request),
+            'flash' => [
+                'success' => fn (): ?string => $request->session()->get('success'),
+            ],
         ]);
+    }
+
+    /** @return array{value: string, label: string}|null */
+    private function planFor(Request $request): ?array
+    {
+        $user = $request->user();
+        if ($user === null) {
+            return null;
+        }
+
+        $plan = app(PlanResolver::class)->for($user);
+
+        return ['value' => $plan->value, 'label' => $plan->label()];
     }
 }

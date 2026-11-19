@@ -21,10 +21,58 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+export type PlanValue = 'free' | 'pro';
+export type SpaceTheme = 'light' | 'dark' | 'brand';
+export type TestimonialStatus = 'pending' | 'published' | 'hidden';
+export type OptionalFieldKey = 'company' | 'title' | 'social_link' | 'photo';
+
+export interface FieldConfig {
+    enabled: boolean;
+    required: boolean;
+}
+
+export type FieldsConfig = Record<OptionalFieldKey, FieldConfig>;
+
+export interface Space {
+    public_id: string;
+    name: string;
+    slug: string;
+    logo_url: string | null;
+    header_title: string;
+    message: string;
+    collect_rating: boolean;
+    theme: SpaceTheme;
+    fields: FieldsConfig;
+    is_accepting: boolean;
+    testimonials_count?: number;
+}
+
+export interface Testimonial {
+    public_id: string;
+    rating: number | null;
+    body: string;
+    respondent_name: string;
+    respondent_email?: string;
+    company: string | null;
+    title: string | null;
+    social_link: string | null;
+    photo_url: string | null;
+    status: TestimonialStatus;
+    is_favorite: boolean;
+    submitted_at: string;
+}
+
+export interface PlanInfo {
+    value: PlanValue;
+    label: string;
+}
+
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    plan: PlanInfo | null;
+    flash: { success: string | null };
     [key: string]: unknown;
 }
 
