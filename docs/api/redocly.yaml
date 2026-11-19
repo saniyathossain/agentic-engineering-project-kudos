@@ -1,0 +1,9 @@
+# Used with: redocly lint --config docs/api/redocly.yaml docs/api/openapi.yaml
+# The three switched-off rules do not fit this API: many routes legitimately answer only with a redirect (no 2xx), the
+# probes have no 4xx, and the servers are intentionally localhost.
+extends:
+  - recommended
+rules:
+  operation-2xx-response: off
+  operation-4xx-response: off
+  no-server-example.com: off
