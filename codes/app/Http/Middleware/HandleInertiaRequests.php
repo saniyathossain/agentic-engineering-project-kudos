@@ -51,6 +51,7 @@ final class HandleInertiaRequests extends Middleware
             'plan' => fn (): ?array => $this->planFor($request),
             'flash' => [
                 'success' => fn (): ?string => $request->session()->get('success'),
+                'error' => fn (): ?string => $request->session()->get('error'),
             ],
         ]);
     }

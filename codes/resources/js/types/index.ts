@@ -26,10 +26,10 @@ export type SpaceTheme = 'light' | 'dark' | 'brand';
 export type TestimonialStatus = 'pending' | 'published' | 'hidden';
 export type OptionalFieldKey = 'company' | 'title' | 'social_link' | 'photo';
 
-export interface FieldConfig {
+export type FieldConfig = {
     enabled: boolean;
     required: boolean;
-}
+};
 
 export type FieldsConfig = Record<OptionalFieldKey, FieldConfig>;
 
@@ -72,7 +72,7 @@ export interface SharedData {
     quote: { message: string; author: string };
     auth: Auth;
     plan: PlanInfo | null;
-    flash: { success: string | null };
+    flash: { success: string | null; error: string | null };
     [key: string]: unknown;
 }
 
