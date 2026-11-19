@@ -1,25 +1,24 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Link, router } from '@inertiajs/react';
-import { X } from 'lucide-react';
+import { Sparkles, X } from 'lucide-react';
 
 export default function UpgradeBanner() {
     const dismiss = () => router.post('/dashboard/banner/dismiss', {}, { preserveScroll: true, preserveState: true });
 
     return (
-        <Alert className="flex items-start justify-between gap-4">
-            <div>
-                <AlertTitle>Unlock unlimited spaces and testimonials</AlertTitle>
-                <AlertDescription>
-                    The Free plan includes 1 space and 10 testimonials per space.{' '}
-                    <Link href="/billing" className="font-medium underline underline-offset-4">
-                        Upgrade to Pro
-                    </Link>
-                </AlertDescription>
-            </div>
-            <Button type="button" variant="ghost" size="icon" aria-label="Dismiss" onClick={dismiss}>
-                <X />
+        <aside className="pane-accent rise flex items-center gap-4 rounded-2xl p-4" aria-label="Upgrade">
+            <span className="icon-chip shrink-0">
+                <Sparkles className="size-[18px]" strokeWidth={1.75} />
+            </span>
+            <p className="min-w-0 flex-1 text-sm">
+                <span className="font-medium">Free plan: 1 space, 10 testimonials per space.</span>{' '}
+                <Link href="/billing" className="text-primary font-medium underline underline-offset-4">
+                    See Pro
+                </Link>
+            </p>
+            <Button type="button" variant="ghost" size="icon" className="size-8 shrink-0" aria-label="Dismiss" onClick={dismiss}>
+                <X strokeWidth={1.75} />
             </Button>
-        </Alert>
+        </aside>
     );
 }

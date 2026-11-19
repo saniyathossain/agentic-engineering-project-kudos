@@ -1,23 +1,26 @@
 import StarRating from '@/components/star-rating';
-import { type EmbedTestimonial } from '@/types';
+import { THEME_CLASSES } from '@/lib/space-theme';
+import { cn } from '@/lib/utils';
+import { type EmbedTestimonial, type SpaceTheme } from '@/types';
 
 interface EmbedTestimonialCardProps {
     testimonial: EmbedTestimonial;
-    cardClassName: string;
+    theme: SpaceTheme;
 }
 
-export default function EmbedTestimonialCard({ testimonial, cardClassName }: EmbedTestimonialCardProps) {
+export default function EmbedTestimonialCard({ testimonial, theme }: EmbedTestimonialCardProps) {
+    const classes = THEME_CLASSES[theme];
     const byline = [testimonial.title, testimonial.company].filter(Boolean).join(' at ');
 
     return (
-        <figure className={`flex flex-col gap-3 rounded-xl border p-5 ${cardClassName}`}>
-            {testimonial.rating !== null && <StarRating value={testimonial.rating} className="text-amber-400" />}
-            <blockquote className="text-sm leading-relaxed whitespace-pre-line">{testimonial.body}</blockquote>
+        <figure className={cn('flex flex-col gap-4 rounded-2xl border p-5', classes.surface)}>
+            {testimonial.rating !== null && <StarRating value={testimonial.rating} className={classes.star} />}
+            <blockquote className="font-display text-[1.05rem] leading-relaxed whitespace-pre-line">{testimonial.body}</blockquote>
             <figcaption className="mt-auto flex items-center gap-3">
                 {testimonial.photo_url && <img src={testimonial.photo_url} alt="" className="size-10 rounded-full object-cover" loading="lazy" />}
                 <div className="text-sm">
                     <div className="font-semibold">{testimonial.respondent_name}</div>
-                    {byline && <div className="text-xs opacity-70">{byline}</div>}
+                    {byline && <div className={cn('text-xs', classes.muted)}>{byline}</div>}
                 </div>
             </figcaption>
         </figure>

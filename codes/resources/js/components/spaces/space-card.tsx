@@ -1,32 +1,45 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { type Space } from '@/types';
 import { Link } from '@inertiajs/react';
+import { ArrowUpRight, MessageSquareQuote, Pencil } from 'lucide-react';
+import { type CSSProperties } from 'react';
 
 interface SpaceCardProps {
     space: Space;
+    index: number;
 }
 
-export default function SpaceCard({ space }: SpaceCardProps) {
+export default function SpaceCard({ space, index }: SpaceCardProps) {
     return (
-        <Card>
-            <CardHeader className="flex-row items-start justify-between gap-2">
-                <CardTitle className="text-lg">{space.name}</CardTitle>
+        <Card
+            className="rise group flex flex-col gap-4 p-5 transition-[transform,box-shadow] duration-300 ease-(--ease-liquid) hover:-translate-y-0.5 hover:shadow-(--sh-lg)"
+            style={{ '--i': index } as CSSProperties}
+        >
+            <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                    <h2 className="font-display truncate text-xl font-medium">{space.name}</h2>
+                    <p className="text-muted-foreground truncate text-sm">/{space.slug}</p>
+                </div>
                 <Badge variant={space.is_accepting ? 'default' : 'secondary'}>{space.is_accepting ? 'Collecting' : 'Paused'}</Badge>
-            </CardHeader>
-            <CardContent className="text-muted-foreground text-sm">
-                <p>/{space.slug}</p>
-                <p>{space.testimonials_count ?? 0} testimonials</p>
-            </CardContent>
-            <CardFooter className="gap-2">
+            </div>
+            <p className="text-muted-foreground flex items-center gap-2 text-sm">
+                <MessageSquareQuote className="size-4" strokeWidth={1.75} />
+                {space.testimonials_count ?? 0} testimonials
+            </p>
+            <div className="mt-auto flex gap-2">
                 <Button asChild size="sm">
-                    <Link href={route('spaces.show', space.public_id)}>Open inbox</Link>
+                    <Link href={route('spaces.show', space.public_id)}>
+                        Open inbox <ArrowUpRight strokeWidth={1.75} />
+                    </Link>
                 </Button>
                 <Button asChild size="sm" variant="outline">
-                    <Link href={route('spaces.edit', space.public_id)}>Edit</Link>
+                    <Link href={route('spaces.edit', space.public_id)}>
+                        <Pencil strokeWidth={1.75} /> Edit
+                    </Link>
                 </Button>
-            </CardFooter>
+            </div>
         </Card>
     );
 }

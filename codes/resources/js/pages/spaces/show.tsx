@@ -1,12 +1,15 @@
 import CopyButton from '@/components/copy-button';
 import EmbedSnippet from '@/components/embed-snippet';
 import FlashMessage from '@/components/flash-message';
+import PageHeader from '@/components/page-header';
 import TestimonialCard from '@/components/spaces/testimonial-card';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type Space, type Testimonial } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
+import { ExternalLink, Pencil, Trash2 } from 'lucide-react';
+import { type CSSProperties } from 'react';
 
 type InboxFilter = 'all' | 'favorite' | 'pending' | 'published' | 'hidden';
 
@@ -40,52 +43,71 @@ export default function Show({ space, testimonials, filter, counts, publicUrl }:
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={space.name} />
-            <div className="flex flex-col gap-4 p-4">
+            <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 p-4 sm:p-6">
                 <FlashMessage />
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                        <h1 className="text-2xl font-semibold">{space.name}</h1>
-                        <p className="text-muted-foreground text-sm">{publicUrl}</p>
-                    </div>
-                    <div className="flex gap-2">
-                        <CopyButton text={publicUrl} label="Copy link" />
-                        <Button asChild variant="outline" size="sm">
-                            <a href={publicUrl} target="_blank" rel="noreferrer">
-                                Visit
-                            </a>
-                        </Button>
-                        <Button asChild variant="outline" size="sm">
-                            <Link href={route('spaces.edit', space.public_id)}>Edit</Link>
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => window.confirm('Delete this space and all its testimonials?') && router.delete(route('spaces.destroy', space.public_id))}
-                        >
-                            Delete
-                        </Button>
-                    </div>
-                </div>
+                <PageHeader
+                    title={space.name}
+                    description={publicUrl}
+                    actions={
+                        <>
+                            <CopyButton text={publicUrl} label="Copy link" />
+                            <Button asChild variant="outline" size="sm">
+                                <a href={publicUrl} target="_blank" rel="noreferrer">
+                                    <ExternalLink strokeWidth={1.75} /> Visit
+                                </a>
+                            </Button>
+                            <Button asChild variant="outline" size="sm">
+                                <Link href={route('spaces.edit', space.public_id)}>
+                                    <Pencil strokeWidth={1.75} /> Edit
+                                </Link>
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                aria-label="Delete space"
+                                onClick={() =>
+                                    window.confirm('Delete this space and all its testimonials?') &&
+                                    router.delete(route('spaces.destroy', space.public_id))
+                                }
+                            >
+                                <Trash2 strokeWidth={1.75} />
+                            </Button>
+                        </>
+                    }
+                />
 
-                <EmbedSnippet publicId={space.public_id} />
+                <section className="pane rise rounded-2xl p-5" style={{ '--i': 1 } as CSSProperties} aria-label="Embed on your site">
+                    <h2 className="font-display mb-1 text-lg font-medium">Show them on your site</h2>
+                    <p className="text-muted-foreground mb-3 text-sm">
+                        Published testimonials appear in this wall. Paste the snippet where you want it.
+                    </p>
+                    <EmbedSnippet publicId={space.public_id} />
+                </section>
 
-                <nav className="flex flex-wrap gap-2" aria-label="Inbox filters">
+                <nav className="bg-muted flex w-fit max-w-full gap-1 overflow-x-auto rounded-xl p-1" aria-label="Inbox filters">
                     {FILTERS.map(({ value, label }) => (
                         <Link
                             key={value}
                             href={route('spaces.show', { space: space.public_id, filter: value })}
                             preserveScroll
-                            className={cn('rounded-full border px-3 py-1 text-sm', filter === value ? 'bg-primary text-primary-foreground' : 'hover:bg-muted')}
+                            aria-current={filter === value ? 'page' : undefined}
+                            className={cn(
+                                'rounded-lg px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-[background-color,color,box-shadow] duration-200',
+                                filter === value ? 'bg-card text-foreground shadow-(--sh-sm)' : 'text-muted-foreground hover:text-foreground',
+                            )}
                         >
-                            {label} ({counts[value]})
+                            {label} <span className="text-muted-foreground tabular-nums">{counts[value]}</span>
                         </Link>
                     ))}
                 </nav>
 
                 {testimonials.data.length === 0 ? (
-                    <p className="text-muted-foreground">No testimonials here yet.</p>
+                    <div className="pane rise rounded-2xl px-6 py-14 text-center">
+                        <p className="font-display text-xl">Nothing here yet</p>
+                        <p className="text-muted-foreground mt-1 text-sm">Share your link and new testimonials will appear in this inbox.</p>
+                    </div>
                 ) : (
-                    <div className="grid gap-3">
+                    <div className="grid gap-4">
                         {testimonials.data.map((testimonial) => (
                             <TestimonialCard key={testimonial.public_id} testimonial={testimonial} />
                         ))}

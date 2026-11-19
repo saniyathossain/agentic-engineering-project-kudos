@@ -65,6 +65,16 @@ Without keys the billing page explains that Stripe is not configured and the Upg
 
 Known gaps: only Postgres is exercised in dev (tests use sqlite); no SSR/CSP tuning; browser checks were manual — there is no automated end-to-end suite.
 
+## Design
+
+Direction documented in [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md), drawn from the Shell Console glass language and the Python Learning design rules.
+Warm paper canvas with an equal dark twin (oklch tokens in `codes/resources/css/app.css`), one coral accent, amber reserved for star ratings,
+Fraunces serif for headlines and quotes with Instrument Sans for the UI. Liquid glass only on floating chrome (sidebar, top bar, menus, dialogs);
+content sits on translucent panes. CSS-only motion (staggered rise, button lift/press, drifting hero cards), disabled under `prefers-reduced-motion`
+and `prefers-reduced-transparency`. Lucide icons throughout, no emoji, no gradient text. Space themes (light/dark/brand) are the owner's choice on the public page and embed.
+Theme toggle (light / dark / system) is in the app header, auth pages and landing page. Layouts were checked at desktop and phone width.
+Current screenshots: `docs/screenshots/design-*.jpg`.
+
 ## Code standards
 
 Enforced by Pint (`pint.json`: PSR-12, strict types, `final`), Larastan level 8 (baseline covers starter-kit code only), TypeScript `strict`.

@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { type DashboardRange } from '@/types';
 
 const RANGES: DashboardRange[] = [7, 30, 90];
@@ -10,18 +10,20 @@ interface RangeToggleProps {
 
 export default function RangeToggle({ value, onChange }: RangeToggleProps) {
     return (
-        <div className="flex gap-1" role="group" aria-label="Date range">
+        <div className="bg-muted inline-flex rounded-xl p-1" role="group" aria-label="Date range">
             {RANGES.map((range) => (
-                <Button
+                <button
                     key={range}
                     type="button"
-                    size="sm"
-                    variant={range === value ? 'default' : 'outline'}
                     aria-pressed={range === value}
                     onClick={() => onChange(range)}
+                    className={cn(
+                        'rounded-lg px-3 py-1 text-sm font-medium transition-[background-color,color,box-shadow] duration-200',
+                        range === value ? 'bg-card text-foreground shadow-(--sh-sm)' : 'text-muted-foreground hover:text-foreground',
+                    )}
                 >
-                    {range}d
-                </Button>
+                    {range} days
+                </button>
             ))}
         </div>
     );

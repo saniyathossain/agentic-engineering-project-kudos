@@ -5,17 +5,17 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { type Testimonial, type TestimonialStatus } from '@/types';
 import { router } from '@inertiajs/react';
-import { Heart, Trash2 } from 'lucide-react';
+import { Eye, EyeOff, Heart, type LucideIcon, Pencil, Send, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface TestimonialCardProps {
     testimonial: Testimonial;
 }
 
-const STATUS_ACTIONS: ReadonlyArray<{ status: TestimonialStatus; label: string }> = [
-    { status: 'published', label: 'Publish' },
-    { status: 'hidden', label: 'Hide' },
-    { status: 'pending', label: 'Mark pending' },
+const STATUS_ACTIONS: ReadonlyArray<{ status: TestimonialStatus; label: string; icon: LucideIcon }> = [
+    { status: 'published', label: 'Publish', icon: Send },
+    { status: 'hidden', label: 'Hide', icon: EyeOff },
+    { status: 'pending', label: 'Mark pending', icon: Eye },
 ];
 
 export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
@@ -31,11 +31,11 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
     };
 
     return (
-        <Card>
-            <CardContent className="space-y-3 pt-6">
+        <Card className="rise">
+            <CardContent className="space-y-4 p-5 sm:p-6">
                 <div className="flex items-start justify-between gap-2">
                     <div>
-                        <p className="font-medium">{testimonial.respondent_name}</p>
+                        <p className="font-semibold">{testimonial.respondent_name}</p>
                         <p className="text-muted-foreground text-sm">
                             {testimonial.respondent_email}
                             {testimonial.company ? ` · ${testimonial.company}` : ''}
@@ -45,7 +45,7 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
                     <Badge variant={testimonial.status === 'published' ? 'default' : 'secondary'}>{testimonial.status}</Badge>
                 </div>
 
-                {testimonial.rating !== null && <StarRating value={testimonial.rating} className="text-amber-500" />}
+                {testimonial.rating !== null && <StarRating value={testimonial.rating} />}
 
                 {editing ? (
                     <div className="space-y-2">
@@ -60,24 +60,34 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
                         </div>
                     </div>
                 ) : (
-                    <p className="whitespace-pre-line">{testimonial.body}</p>
+                    <blockquote className="font-display text-lg leading-relaxed whitespace-pre-line">{testimonial.body}</blockquote>
                 )}
 
                 <div className="flex flex-wrap gap-2">
-                    {STATUS_ACTIONS.filter(({ status }) => status !== testimonial.status).map(({ status, label }) => (
-                        <Button key={status} size="sm" variant="outline" onClick={() => router.patch(base('testimonials.status'), { status }, { preserveScroll: true })}>
-                            {label}
+                    {STATUS_ACTIONS.filter(({ status }) => status !== testimonial.status).map(({ status, label, icon: Icon }) => (
+                        <Button
+                            key={status}
+                            size="sm"
+                            variant="outline"
+                            onClick={() => router.patch(base('testimonials.status'), { status }, { preserveScroll: true })}
+                        >
+                            <Icon strokeWidth={1.75} /> {label}
                         </Button>
                     ))}
-                    <Button size="sm" variant="outline" aria-pressed={testimonial.is_favorite} onClick={() => router.patch(base('testimonials.favorite'), {}, { preserveScroll: true })}>
-                        <Heart className={testimonial.is_favorite ? 'size-4 fill-current text-rose-500' : 'size-4'} />
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        aria-pressed={testimonial.is_favorite}
+                        onClick={() => router.patch(base('testimonials.favorite'), {}, { preserveScroll: true })}
+                    >
+                        <Heart strokeWidth={1.75} className={testimonial.is_favorite ? 'text-destructive fill-current' : ''} />
                         {testimonial.is_favorite ? 'Favorited' : 'Favorite'}
                     </Button>
                     <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
-                        Edit
+                        <Pencil strokeWidth={1.75} /> Edit
                     </Button>
                     <Button size="sm" variant="ghost" onClick={remove} aria-label="Delete testimonial">
-                        <Trash2 className="size-4" />
+                        <Trash2 strokeWidth={1.75} />
                     </Button>
                 </div>
             </CardContent>

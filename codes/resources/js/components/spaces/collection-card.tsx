@@ -18,15 +18,17 @@ interface CollectionCardProps {
     children?: ReactNode;
 }
 
-/** The themed card respondents see; also used as the live preview in the space form. */
+/** The themed card respondents see; also the live preview in the space form. */
 export default function CollectionCard({ space, children }: CollectionCardProps) {
     const theme = THEME_CLASSES[space.theme];
 
     return (
-        <section className={cn('w-full max-w-xl rounded-2xl border p-6 shadow-sm', theme.surface, theme.text)}>
-            {space.logo_url && <img src={space.logo_url} alt="" className="mb-4 size-14 rounded-lg object-cover" />}
-            <h2 className="text-2xl font-semibold">{space.header_title || 'Your header goes here…'}</h2>
-            <MarkdownText className={cn('prose-sm mt-2 space-y-2', theme.muted)}>{space.message || 'Your message goes here…'}</MarkdownText>
+        <section className={cn('rise w-full max-w-xl rounded-3xl border p-6 sm:p-8', theme.surface, theme.text)}>
+            {space.logo_url && <img src={space.logo_url} alt="" className="mb-5 size-14 rounded-2xl object-cover" />}
+            <h2 className="font-display text-3xl leading-tight font-medium">{space.header_title || 'Your header goes here'}</h2>
+            <MarkdownText className={cn('mt-3 space-y-2 text-[0.95rem] leading-relaxed', theme.muted)}>
+                {space.message || 'Your message goes here.'}
+            </MarkdownText>
             {children}
         </section>
     );

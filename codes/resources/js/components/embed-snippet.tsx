@@ -13,7 +13,7 @@ export default function EmbedSnippet({ publicId }: EmbedSnippetProps) {
 
     return (
         <div className="space-y-2">
-            <pre className="bg-muted overflow-x-auto rounded-md border p-3 text-xs break-all whitespace-pre-wrap">
+            <pre className="bg-muted/70 overflow-x-auto rounded-xl border p-3 font-mono text-xs leading-relaxed break-all whitespace-pre-wrap">
                 <code>{snippet}</code>
             </pre>
             <CopyButton text={snippet} />

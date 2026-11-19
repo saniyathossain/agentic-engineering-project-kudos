@@ -57,7 +57,7 @@ export default function TestimonialForm({ space }: TestimonialFormProps) {
             {space.collect_rating && (
                 <div className="grid gap-1.5">
                     <Label>Rating *</Label>
-                    <StarRating value={data.rating} onChange={(value) => setData('rating', value)} className={theme.accent} />
+                    <StarRating value={data.rating} onChange={(value) => setData('rating', value)} className={theme.star} />
                     <InputError message={errors.rating} />
                 </div>
             )}
@@ -71,12 +71,27 @@ export default function TestimonialForm({ space }: TestimonialFormProps) {
             <div className="grid gap-4 sm:grid-cols-2">
                 <div className="grid gap-1.5">
                     <Label htmlFor="name">Name *</Label>
-                    <Input id="name" required autoComplete="name" value={data.name} onChange={(e) => setData('name', e.target.value)} className={theme.input} />
+                    <Input
+                        id="name"
+                        required
+                        autoComplete="name"
+                        value={data.name}
+                        onChange={(e) => setData('name', e.target.value)}
+                        className={theme.input}
+                    />
                     <InputError message={errors.name} />
                 </div>
                 <div className="grid gap-1.5">
                     <Label htmlFor="email">Email * (never shown publicly)</Label>
-                    <Input id="email" type="email" required autoComplete="email" value={data.email} onChange={(e) => setData('email', e.target.value)} className={theme.input} />
+                    <Input
+                        id="email"
+                        type="email"
+                        required
+                        autoComplete="email"
+                        value={data.email}
+                        onChange={(e) => setData('email', e.target.value)}
+                        className={theme.input}
+                    />
                     <InputError message={errors.email} />
                 </div>
             </div>
@@ -87,7 +102,14 @@ export default function TestimonialForm({ space }: TestimonialFormProps) {
                         {label}
                         {space.fields[key].required ? ' *' : ''}
                     </Label>
-                    <Input id={key} type={type} required={space.fields[key].required} value={data[key]} onChange={(e) => setData(key, e.target.value)} className={theme.input} />
+                    <Input
+                        id={key}
+                        type={type}
+                        required={space.fields[key].required}
+                        value={data[key]}
+                        onChange={(e) => setData(key, e.target.value)}
+                        className={theme.input}
+                    />
                     <InputError message={errors[key]} />
                 </div>
             ))}
@@ -95,20 +117,32 @@ export default function TestimonialForm({ space }: TestimonialFormProps) {
             {space.fields.photo.enabled && (
                 <div className="grid gap-1.5">
                     <Label htmlFor="photo">Your photo{space.fields.photo.required ? ' *' : ''}</Label>
-                    <Input id="photo" type="file" accept="image/png,image/jpeg,image/webp" required={space.fields.photo.required} onChange={(e) => setData('photo', e.target.files?.[0] ?? null)} className={theme.input} />
+                    <Input
+                        id="photo"
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp"
+                        required={space.fields.photo.required}
+                        onChange={(e) => setData('photo', e.target.files?.[0] ?? null)}
+                        className={theme.input}
+                    />
                     <InputError message={errors.photo} />
                 </div>
             )}
 
             <div className="flex items-start gap-2">
-                <Checkbox id="consent" checked={data.consent} onCheckedChange={(checked) => setData('consent', checked === true)} />
+                <Checkbox
+                    id="consent"
+                    className="border-current/50 data-[state=checked]:border-transparent"
+                    checked={data.consent}
+                    onCheckedChange={(checked) => setData('consent', checked === true)}
+                />
                 <Label htmlFor="consent" className="text-sm leading-snug font-normal">
                     I give permission to use this testimonial across social channels and other marketing efforts.
                 </Label>
             </div>
             <InputError message={errors.consent} />
 
-            <Button type="submit" disabled={processing} className={cn('w-full', theme.button)}>
+            <Button type="submit" disabled={processing} size="lg" className={cn('w-full shadow-none', theme.button)}>
                 {processing ? 'Sending…' : 'Send testimonial'}
             </Button>
         </form>
