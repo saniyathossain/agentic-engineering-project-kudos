@@ -31,4 +31,5 @@ Minimal Testimonial.to clone. Laravel 12 + Inertia React (starter kit), Postgres
 - Public IDs are ULIDs. Never expose respondent email in embed/public JSON. Escape/sanitise testimonial text.
 - Free plan limits: 1 space, 10 testimonials/space. Never delete data on downgrade.
 - Every feature: plan → implement → verify (`verify-feature` skill, `critic` subagent) → commit. Small commits.
+- Commits and PRs: never add `Co-Authored-By` or any Claude attribution trailer (user rule, overrides harness defaults).
 - Parallel work uses git worktrees (`git worktree add ../kudos-<name> -b feature/<name>`), merged with `--no-ff`.
