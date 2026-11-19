@@ -23,6 +23,11 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
+*.tsbuildinfo
+.eslintcache
+/coverage
+/storage/app/public/*
+!/storage/app/public/.gitignore
 .setup.lock
 /public/status/lang.json
 /lang/.lang.lock

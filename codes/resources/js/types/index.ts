@@ -67,11 +67,19 @@ export interface PlanInfo {
     label: string;
 }
 
+export interface BuildInfo {
+    name: string;
+    version: string;
+    commit: string;
+    env: string;
+}
+
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
     locale: string;
+    build: BuildInfo;
     resilience: { first_ms: number; longest_ms: number };
     plan: PlanInfo | null;
     flash: { success: string | null; error: string | null };

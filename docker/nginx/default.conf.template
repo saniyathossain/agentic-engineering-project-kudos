@@ -21,7 +21,32 @@ server {
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     add_header X-Frame-Options "SAMEORIGIN" always;
 
+    # compress text responses (the JS bundle is the bulk of a page's weight)
+    gzip on;
+    gzip_comp_level 5;
+    gzip_min_length 1024;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_types text/css application/javascript text/javascript application/json image/svg+xml text/plain application/xml;
+
     location = /healthz { access_log off; return 200 "ok\n"; }
+
+    # Rate limiting answers 429 (not nginx's default 503, which would read as an outage) with a calm static page.
+    limit_req_status 429;
+    error_page 429 @throttled;
+    location @throttled {
+        internal;
+        add_header Retry-After 6 always;
+        add_header Cache-Control "no-store" always;
+        add_header X-Edge "nginx" always;
+        add_header X-Request-ID $req_id always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'" always;
+        if ($http_accept ~* "application/json") {
+            return 429 '{"error":"Too many requests. Wait a moment and try again.","code":"throttled","source":"edge","request_id":"$req_id"}';
+        }
+        rewrite ^ /throttled.html break;
+    }
 
     # When the app does not answer, the edge answers instead: a 503 with Retry-After, never a bare 502/504.
     error_page 502 503 504 =503 @unavailable;
@@ -49,6 +74,7 @@ server {
     # Served by the edge itself, so the outage page has its styles, script and words with the app down.
     location ^~ /status/ { expires 5m; try_files $uri =404; }
     location = /outage.html { internal; }
+    location = /throttled.html { internal; }
 
     location /build/ { expires 1y; add_header Cache-Control "public, immutable"; try_files $uri =404; }
 

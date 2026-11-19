@@ -53,7 +53,9 @@ RUN npm run build
 # ---- prod --------------------------------------------------------------------------------------------------
 FROM runtime AS prod
 LABEL org.opencontainers.image.title="kudos-app" org.opencontainers.image.description="Kudos php-fpm application image"
-ENV APP_ENV=production APP_DEBUG=false
+ARG GIT_SHA=
+ARG APP_VERSION=dev
+ENV APP_ENV=production APP_DEBUG=false APP_COMMIT=${GIT_SHA} APP_VERSION=${APP_VERSION}
 COPY docker/php/php-prod.ini /usr/local/etc/php/conf.d/zz-prod.ini
 COPY docker/php/www.conf /usr/local/etc/php-fpm.d/zz-www.conf
 COPY --chmod=0755 docker/entrypoint.prod.sh /usr/local/bin/entrypoint.sh

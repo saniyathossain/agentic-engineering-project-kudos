@@ -10,7 +10,8 @@ return [
     'csp' => [
         'enabled' => (bool) env('CSP_ENABLED', env('APP_ENV') === 'production'),
         'report_only' => (bool) env('CSP_REPORT_ONLY', false),
-        'style_sources' => ['https://fonts.bunny.net'],
-        'font_sources' => ['https://fonts.bunny.net'],
+        // extra origins, empty by default: styles, scripts and fonts are all served from this origin
+        'style_sources' => [],
+        'font_sources' => [],
     ],
 ];

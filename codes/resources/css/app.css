@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+/* fonts are served from this origin (bundled by Vite): no third-party request, no CSP exception */
+@import '@fontsource-variable/instrument-sans';
+@import '@fontsource-variable/fraunces';
+
 @plugin 'tailwindcss-animate';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -7,8 +11,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-    --font-display: 'Fraunces', ui-serif, 'Iowan Old Style', Georgia, serif;
+    --font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-display: 'Fraunces Variable', ui-serif, 'Iowan Old Style', Georgia, serif;
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);

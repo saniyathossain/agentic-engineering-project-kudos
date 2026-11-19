@@ -51,6 +51,12 @@ final class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'locale' => app()->getLocale(),
+            'build' => [
+                'name' => config('app.name'),
+                'version' => config('observability.version'),
+                'commit' => config('observability.commit'),
+                'env' => app()->environment(),
+            ],
             'resilience' => config('resilience.outage'),
             'plan' => fn (): ?array => $this->planFor($request),
             'flash' => [

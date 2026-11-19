@@ -18,6 +18,9 @@ x-prod: &prod
     context: ../
     dockerfile: docker/Dockerfile
     target: prod
+    args:
+      GIT_SHA: ${GIT_SHA:-}
+      APP_VERSION: ${APP_VERSION:-dev}
   env_file:
     - .envs/app.prod.env
     - .envs/outage.env

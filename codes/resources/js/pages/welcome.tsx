@@ -1,3 +1,4 @@
+import AppFooter from '@/components/app-footer';
 import AppLogoIcon from '@/components/app-logo-icon';
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import StarRating from '@/components/star-rating';
@@ -132,6 +133,7 @@ export default function Welcome() {
                     ))}
                 </section>
             </div>
+            <AppFooter />
         </>
     );
 }

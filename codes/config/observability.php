@@ -9,6 +9,7 @@ return [
     'service' => env('LOG_SERVICE', 'kudos'),
     'role' => env('APP_ROLE', 'web'),
     'version' => env('APP_VERSION', 'dev'),
+    'commit' => env('APP_COMMIT', ''),
 
     /*
     | Correlation: accepted from the edge/client when valid, otherwise generated, and echoed on the response.

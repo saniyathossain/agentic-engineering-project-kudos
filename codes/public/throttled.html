@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="robots" content="noindex">
+    <meta name="description" content="Too many requests. Wait a moment and try again.">
+    <title>Too many requests</title>
+    <link rel="stylesheet" href="/status/status.css">
+    <script src="/status/status.js"></script>
+</head>
+<body>
+    <!-- Served by the edge (nginx) with status 429 when a client goes over a rate limit. Words come from /status/lang.json. -->
+    <main class="card" role="alert">
+        <span class="chip-icon calm pulse" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </span>
+        <h1 data-i18n="status.title.429">Too many requests</h1>
+        <p data-i18n="status.why.429">You are going a little fast. Wait a moment and try again.</p>
+        <div class="actions">
+            <a class="btn primary" href="/" data-reload><span data-i18n="status.action.retry">Try again</span></a>
+        </div>
+    </main>
+</body>
+</html>

@@ -14,8 +14,6 @@
     <meta name="color-scheme" content="light dark">
     <meta name="robots" content="noindex">
     <title>{{ __('status.title.'.$key) }} - {{ config('app.name') }}</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600|fraunces:500" rel="stylesheet">
     <link rel="stylesheet" href="/status/status.css">
     <script src="/status/status.js"></script>
 </head>
