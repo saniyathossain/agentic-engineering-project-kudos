@@ -18,7 +18,7 @@ interface PlanCardProps {
 
 export default function PlanCard({ name, price, tagline, features, current, highlighted = false, index, action }: PlanCardProps) {
     return (
-        <Card className={cn('rise flex flex-col gap-5 p-6', highlighted && 'pane-accent')} style={{ '--i': index } as CSSProperties}>
+        <Card className={cn('rise lift flex flex-col gap-5 p-6', highlighted && 'pane-accent')} style={{ '--i': index } as CSSProperties}>
             <div className="space-y-1">
                 <div className="flex items-center justify-between gap-2">
                     <h2 className="font-display text-2xl font-medium">{name}</h2>

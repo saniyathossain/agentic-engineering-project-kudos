@@ -14,10 +14,7 @@ interface SpaceCardProps {
 
 export default function SpaceCard({ space, index }: SpaceCardProps) {
     return (
-        <Card
-            className="rise group flex min-w-0 flex-col gap-4 p-5 transition-[transform,box-shadow] duration-300 ease-(--ease-liquid) hover:-translate-y-0.5 hover:shadow-(--sh-lg)"
-            style={{ '--i': index } as CSSProperties}
-        >
+        <Card className="rise lift group flex min-w-0 flex-col gap-4 p-5" style={{ '--i': index } as CSSProperties}>
             <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                     <h2 className="font-display truncate text-xl font-medium">{space.name}</h2>

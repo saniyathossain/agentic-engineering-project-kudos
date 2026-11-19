@@ -36,7 +36,7 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
     };
 
     return (
-        <Card className="rise cv-auto">
+        <Card className="rise lift cv-auto">
             <CardContent className="space-y-4 p-5 sm:p-6">
                 <div className="flex items-start justify-between gap-2">
                     <div>

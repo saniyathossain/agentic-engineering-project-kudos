@@ -58,3 +58,7 @@ docs/performance/*.report.html
 .vscode/
 *.swp
 *.log
+
+# full screenshot capture set (every page, light/dark, desktop/mobile): regenerate locally; only docs/screenshots/readme/ is tracked
+docs/screenshots/all/
+.tmp-demo/

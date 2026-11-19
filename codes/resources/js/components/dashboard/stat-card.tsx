@@ -12,7 +12,7 @@ interface StatCardProps {
 
 export default function StatCard({ label, value, hint, icon: Icon, index = 0 }: StatCardProps) {
     return (
-        <Card className="rise flex flex-col gap-3 p-5" style={{ '--i': index } as CSSProperties}>
+        <Card className="rise lift flex flex-col gap-3 p-5" style={{ '--i': index } as CSSProperties}>
             <div className="flex items-center justify-between">
                 <span className="text-muted-foreground text-sm">{label}</span>
                 <span className="icon-chip">

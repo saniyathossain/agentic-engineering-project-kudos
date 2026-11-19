@@ -121,7 +121,7 @@ final class BillingTest extends TestCase
 
         $this->subscribe($user);
         $this->actingAs($user->refresh())->get('/billing/success?session_id=cs_ok')
-            ->assertSessionHas('success', 'Welcome to Pro! Your upgrade is active.');
+            ->assertSessionHas('success', 'You are on Pro now. Your upgrade is active.');
     }
 
     public function test_downgrade_never_deletes_data_but_stops_new_spaces(): void

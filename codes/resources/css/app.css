@@ -58,9 +58,9 @@
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
 
-    --animate-rise: rise var(--dur-page) var(--ease-liquid) both;
+    --animate-rise: rise var(--dur-page) var(--ease-liquid) backwards;
     --animate-float: float 9s ease-in-out infinite;
-    --animate-pop: pop var(--dur-base) var(--ease-spring) both;
+    --animate-pop: pop var(--dur-base) var(--ease-spring) backwards;
 }
 
 @layer base {
@@ -127,6 +127,11 @@
     :focus-visible {
         outline: 2px solid var(--ring);
         outline-offset: 2px;
+    }
+
+    /* text fields draw focus once, as a border colour plus a soft ring (set on the component), never an extra outline */
+    :is(input, textarea, select, [role='combobox']):focus-visible {
+        outline: none;
     }
 }
 
@@ -200,6 +205,11 @@
     --sh-lg: 0 6px 14px -4px oklch(0.3 0.04 50 / 0.1), 0 28px 56px -16px oklch(0.3 0.04 50 / 0.22);
     --sh-glass: 0 1px 0 oklch(0.3 0.04 50 / 0.04), 0 18px 40px -18px oklch(0.3 0.04 50 / 0.2);
     --lift: 0 1px 1px oklch(0.4 0.14 35 / 0.35), 0 8px 16px -8px oklch(0.5 0.17 35 / 0.55);
+
+    /* liquid glass: a soft sheen from the upper left, and the pane's thickness as light just inside its rim (no hard second line) */
+    --glass-sheen: oklch(1 0 0 / 0.5);
+    --edge-light: inset 0 0 0 0.5px oklch(1 0 0 / 0.5), inset 0 14px 18px -14px oklch(1 0 0 / 0.9), inset 0 -10px 16px -14px oklch(0.8 0.05 60 / 0.3);
+    --pane-hover: oklch(1 0 0 / 0.9);
 }
 
 .dark {
@@ -260,35 +270,101 @@
     --sh-lg: 0 6px 14px -4px oklch(0 0 0 / 0.4), 0 28px 56px -16px oklch(0 0 0 / 0.6);
     --sh-glass: 0 1px 0 oklch(0 0 0 / 0.2), 0 18px 40px -18px oklch(0 0 0 / 0.6);
     --lift: 0 1px 1px oklch(0.3 0.08 40 / 0.6), 0 8px 18px -8px oklch(0.6 0.15 40 / 0.5);
+
+    --glass-sheen: oklch(1 0 0 / 0.1);
+    --edge-light:
+        inset 0 0 0 0.5px oklch(1 0 0 / 0.08), inset 0 14px 18px -14px oklch(1 0 0 / 0.22), inset 0 -10px 16px -14px oklch(0.6 0.12 40 / 0.2);
+    --pane-hover: oklch(0.31 0.014 55 / 0.7);
 }
 
-/* content card: translucent, hairline, soft shadow, lit from above. No backdrop blur so long pages scroll cheaply. */
+/* content card: translucent, one hairline border, soft shadow, light caught just inside the rim. No backdrop blur so long pages scroll cheaply. */
 @utility pane {
     background: linear-gradient(180deg, var(--glass-hi), transparent 55%), var(--card);
     border: 1px solid var(--border);
-    box-shadow:
-        inset 0 1px 0 var(--glass-spec),
-        var(--sh-md);
+    box-shadow: var(--edge-light), var(--sh-sm);
+    transition:
+        transform var(--dur-base) var(--ease-spring),
+        box-shadow var(--dur-base) var(--ease-spring),
+        border-color var(--dur-quick) ease,
+        background-color var(--dur-quick) ease;
 }
 
 /* the one lead card on a page */
 @utility pane-accent {
     background: linear-gradient(180deg, var(--glass-hi), transparent 55%), color-mix(in oklch, var(--primary) 9%, var(--card));
-    border: 1px solid color-mix(in oklch, var(--primary) 26%, var(--border));
-    box-shadow:
-        inset 0 1px 0 var(--glass-spec),
-        var(--sh-md);
+    border: 1px solid color-mix(in oklch, var(--primary) 24%, var(--border));
+    box-shadow: var(--edge-light), var(--sh-sm);
+    transition:
+        transform var(--dur-base) var(--ease-spring),
+        box-shadow var(--dur-base) var(--ease-spring),
+        border-color var(--dur-quick) ease;
 }
 
-/* liquid glass for chrome that content scrolls under: sidebar, top bar, menus, dialogs */
+/* a card that answers the pointer: rises, deepens its shadow and warms its border; settles back on press */
+@utility lift {
+    @media (hover: hover) {
+        &:hover {
+            transform: translate3d(0, -3px, 0);
+            box-shadow: var(--edge-light), var(--sh-lg);
+            border-color: color-mix(in oklch, var(--primary) 30%, var(--border));
+        }
+    }
+    &:active {
+        transform: translate3d(0, -1px, 0) scale(0.992);
+        box-shadow: var(--edge-light), var(--sh-md);
+        transition-duration: 90ms;
+    }
+    &:focus-visible {
+        outline: none;
+        border-color: var(--ring);
+        box-shadow:
+            var(--edge-light),
+            0 0 0 3px color-mix(in oklch, var(--ring) 28%, transparent);
+    }
+}
+
+/* liquid glass for chrome that content scrolls under: sidebar, top bar, menus, dialogs. A wide blur with the colour lifted, a sheen
+   from the upper left, and light caught inside the rim; one border only. */
 @utility glass {
-    background: linear-gradient(180deg, var(--glass-hi), transparent 60%), var(--glass);
-    -webkit-backdrop-filter: blur(24px) saturate(1.7);
-    backdrop-filter: blur(24px) saturate(1.7);
+    background: radial-gradient(120% 140% at 0% 0%, var(--glass-sheen), transparent 60%), var(--glass);
+    -webkit-backdrop-filter: blur(28px) saturate(1.9) brightness(1.04);
+    backdrop-filter: blur(28px) saturate(1.9) brightness(1.04);
     border: 1px solid var(--glass-rim);
-    box-shadow:
-        inset 0 1px 0 var(--glass-spec),
-        var(--sh-glass);
+    box-shadow: var(--edge-light), var(--sh-glass);
+}
+
+/* one treatment for every text field: a hairline, a warmer hairline on hover, and on focus the border takes the accent with a soft ring
+   outside it (a single edge, never an outline plus a ring) */
+@utility field {
+    border: 1px solid var(--input);
+    background-color: color-mix(in oklch, var(--background) 62%, transparent);
+    box-shadow: inset 0 1px 2px oklch(0.3 0.04 50 / 0.05);
+    transition:
+        border-color var(--dur-quick) ease,
+        box-shadow var(--dur-base) var(--ease-spring),
+        background-color var(--dur-quick) ease;
+    &:hover:not(:disabled, :focus-visible, [data-state='open']) {
+        border-color: color-mix(in oklch, var(--ring) 38%, var(--input));
+    }
+    &:is(:focus-visible, [data-state='open']) {
+        outline: none;
+        border-color: var(--ring);
+        background-color: color-mix(in oklch, var(--background) 88%, transparent);
+        box-shadow: 0 0 0 4px color-mix(in oklch, var(--ring) 18%, transparent);
+    }
+    &:active:not(:disabled) {
+        border-color: color-mix(in oklch, var(--ring) 80%, var(--input));
+    }
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+    &[aria-invalid='true'] {
+        border-color: var(--destructive);
+    }
+    &[aria-invalid='true']:focus-visible {
+        box-shadow: 0 0 0 4px color-mix(in oklch, var(--destructive) 18%, transparent);
+    }
 }
 
 @utility font-display {
@@ -318,14 +394,12 @@
 @utility frost {
     background:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"),
-        linear-gradient(180deg, var(--glass-hi), transparent 60%), var(--glass);
+        radial-gradient(120% 160% at 0% 0%, var(--glass-sheen), transparent 60%), var(--glass);
     background-blend-mode: soft-light, normal, normal;
-    -webkit-backdrop-filter: blur(32px) saturate(1.8) brightness(1.03);
-    backdrop-filter: blur(32px) saturate(1.8) brightness(1.03);
+    -webkit-backdrop-filter: blur(32px) saturate(2) brightness(1.04);
+    backdrop-filter: blur(32px) saturate(2) brightness(1.04);
     border: 1px solid var(--glass-rim);
-    box-shadow:
-        inset 0 1px 0 var(--glass-spec),
-        var(--sh-glass);
+    box-shadow: var(--edge-light), var(--sh-glass);
 }
 
 /* typographic shades: primary ink, secondary, tertiary; an eyebrow label; tabular figures */
@@ -587,12 +661,6 @@ html[data-navigating='true'] main {
         backdrop-filter: none;
         background: var(--popover);
     }
-}
-
-/* floating chrome inherits the glass language from the shared sidebar primitives */
-[data-sidebar='sidebar'] {
-    -webkit-backdrop-filter: blur(24px) saturate(1.6);
-    backdrop-filter: blur(24px) saturate(1.6);
 }
 
 @keyframes rise {
