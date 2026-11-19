@@ -1,24 +1,71 @@
+# Build-context filter for docker/Dockerfile (BuildKit reads <Dockerfile>.dockerignore).
+# The context is the repository root. Only what an image needs gets in: the app source, the nginx/php config and the
+# entrypoints. Secrets, VCS data, AI tooling, docs, tests, dependencies and build output are rebuilt or never needed.
+
+# version control, editors, OS noise
 **/.git
+**/.gitignore
+**/.gitattributes
+**/.editorconfig
 **/.DS_Store
+**/.idea
+**/.vscode
+**/*.log
+**/*.swp
+
+# AI tooling, plans, docs and project scripts
 .claude
+.mcp.json
 aidlc
 aidlc-docs
 docs
+scripts
+Makefile
+*.md
+codes/*.md
+
+# docker/: only the files the Dockerfile copies (this also keeps docker/.envs, with its secrets, out of every image)
 docker
 !docker/entrypoint.sh
 !docker/entrypoint.prod.sh
 !docker/php
 !docker/nginx
+
+# dependencies and build output (installed or built inside the image from the lockfiles)
 codes/vendor
 codes/node_modules
-codes/.env
-codes/.setup.lock
-codes/bootstrap/cache/*.php
-codes/storage/logs/*
-codes/storage/framework/cache/*
-codes/storage/framework/sessions/*
-codes/storage/framework/views/*
 codes/public/build
 codes/public/hot
+codes/bootstrap/ssr
+
+# local state, generated files and caches
+codes/.env
+codes/.env.*
+!codes/.env.example
+codes/.setup.lock
+codes/lang/.lang.lock
+codes/public/status/lang.json
 codes/public/storage
+codes/bootstrap/cache/*.php
+codes/storage/app
+codes/storage/logs
+codes/storage/framework/cache
+codes/storage/framework/sessions
+codes/storage/framework/views
+codes/storage/framework/testing
+codes/storage/pail
+codes/database/*.sqlite
+codes/.phpunit.cache
+codes/.phpunit.result.cache
+codes/.eslintcache
+codes/coverage
+
+# tests and test-only config never ship
 codes/tests
+codes/phpunit.xml
+codes/phpstan.neon
+codes/phpstan-baseline.neon
+codes/pint.json
+codes/eslint.config.js
+codes/.prettierrc
+codes/.prettierignore

@@ -8,7 +8,7 @@ dev:
 prod:
 	@test -f docker/.envs/app.prod.env || { echo "create docker/.envs/app.prod.env from app.prod.env.example"; exit 1; }
 	@test -s docker/.envs/secrets/db_password || { echo "create docker/.envs/secrets/db_password (e.g. openssl rand -hex 24 > docker/.envs/secrets/db_password)"; exit 1; }
-	DOCKER_BUILD_MODE=prod $(DC_PROD) up -d --build
+	GIT_SHA=$$(git rev-parse --short HEAD 2>/dev/null || echo dev) DOCKER_BUILD_MODE=prod $(DC_PROD) up -d --build
 down:
 	$(DC) down
 migrate:

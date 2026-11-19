@@ -11,14 +11,13 @@ TARGET="${LIGHTHOUSE_TARGET:-http://web:8080}"
 SCHEME_FLAG=""; [ "$SCHEME" = "dark" ] && SCHEME_FLAG="--blink-settings=preferredColorScheme=1"
 PRESET=""; [ "$FORM" = "desktop" ] && PRESET="--preset=desktop"
 
-docker run --rm --network "$NETWORK" --security-opt seccomp=unconfined \
-  -v "$PWD/docs/performance:/out" --entrypoint sh zenika/alpine-chrome:with-node -c "
-    npx --yes lighthouse@latest '$TARGET$PATH_ARG' $PRESET \
-      --chrome-path=/usr/bin/chromium-browser \
-      --chrome-flags='--headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage $SCHEME_FLAG' \
-      --only-categories=performance,accessibility,best-practices,seo \
-      --output=json --output=html --output-path=/out/$NAME-$FORM-$SCHEME --quiet
-  "
+docker image inspect kudos-lighthouse >/dev/null 2>&1 || docker build -q -t kudos-lighthouse -f scripts/lighthouse.Dockerfile scripts >/dev/null
+
+docker run --rm --network "$NETWORK" --security-opt seccomp=unconfined -v "$PWD/docs/performance:/out" kudos-lighthouse \
+  lighthouse "$TARGET$PATH_ARG" $PRESET \
+    --chrome-flags="--headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage $SCHEME_FLAG" \
+    --only-categories=performance,accessibility,best-practices,seo \
+    --output=json --output=html --output-path="/out/$NAME-$FORM-$SCHEME" --quiet
 python3 - "docs/performance/$NAME-$FORM-$SCHEME.report.json" <<'PY'
 import json, sys
 d = json.load(open(sys.argv[1]))

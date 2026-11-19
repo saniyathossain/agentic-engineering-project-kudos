@@ -1,0 +1,31 @@
+# Normalise line endings; keep binaries binary
+* text=auto eol=lf
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.woff2 binary
+*.ico binary
+
+# Generated or vendored files: collapsed in diffs and ignored by language statistics
+codes/composer.lock    -diff linguist-generated
+codes/package-lock.json -diff linguist-generated
+docs/api/openapi.json   linguist-generated
+docs/api/postman/**     linguist-generated
+docs/api/insomnia/**    linguist-generated
+docs/api/bruno/**       linguist-generated
+docs/performance/**     linguist-generated
+.claude/tools/**        linguist-vendored
+.claude/aidlc-common/** linguist-vendored
+.claude/hooks/**        linguist-vendored
+aidlc/**                linguist-documentation
+docs/**                 linguist-documentation
+docs/screenshots/**     linguist-documentation
+
+# `git archive` / release tarballs carry the application, not the AI tooling, docs or local scripts
+.claude/    export-ignore
+aidlc/      export-ignore
+docs/       export-ignore
+.mcp.json   export-ignore
+scripts/    export-ignore
+PRODUCT.md  export-ignore
+DESIGN.md   export-ignore

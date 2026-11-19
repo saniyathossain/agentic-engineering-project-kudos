@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "icon-tile-stack",
+        "value": "*",
+        "files": [
+          "codes/public/throttled.html"
+        ],
+        "createdAt": "2026-11-19T04:28:49.564Z",
+        "reason": "assistant decision, not user confirmed: single state icon above a centred title on a status card, mirroring the Shell Console outage page the owner named as the reference; same pattern as outage.html"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "codes/public/throttled.html"
+        ],
+        "createdAt": "2026-11-19T04:28:49.582Z",
+        "reason": "assistant decision, not user confirmed: warm canvas with a dark twin is the documented palette in DESIGN.md, derived from the Python Learning design the owner referenced"
+      }
+    ]
+  }
+}
