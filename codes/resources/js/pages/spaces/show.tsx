@@ -1,4 +1,5 @@
 import CopyButton from '@/components/copy-button';
+import EmbedSnippet from '@/components/embed-snippet';
 import FlashMessage from '@/components/flash-message';
 import TestimonialCard from '@/components/spaces/testimonial-card';
 import { Button } from '@/components/ui/button';
@@ -65,6 +66,8 @@ export default function Show({ space, testimonials, filter, counts, publicUrl }:
                         </Button>
                     </div>
                 </div>
+
+                <EmbedSnippet publicId={space.public_id} />
 
                 <nav className="flex flex-wrap gap-2" aria-label="Inbox filters">
                     {FILTERS.map(({ value, label }) => (

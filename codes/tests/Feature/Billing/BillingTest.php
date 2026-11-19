@@ -74,7 +74,7 @@ final class BillingTest extends TestCase
         $this->actingAs($user)->get('/billing')->assertInertia(
             fn ($p) => $p->where('overview.plan.value', 'pro')->where('overview.spaces_max', null)->where('overview.can_manage_billing', true),
         );
-        $this->actingAs($user)->post('/billing/portal')->assertStatus(409)->assertHeader('X-Inertia-Location', 'https://billing.stripe.test/portal');
+        $this->actingAs($user)->post('/billing/portal')->assertRedirect('https://billing.stripe.test/portal');
     }
 
     public function test_pro_user_can_create_more_than_one_space(): void
@@ -91,7 +91,7 @@ final class BillingTest extends TestCase
         $this->fakeGateway();
 
         $this->actingAs(User::factory()->create())->post('/billing/checkout')
-            ->assertStatus(409)->assertHeader('X-Inertia-Location', 'https://checkout.stripe.test/session');
+            ->assertRedirect('https://checkout.stripe.test/session');
     }
 
     public function test_checkout_without_stripe_configuration_degrades_gracefully(): void

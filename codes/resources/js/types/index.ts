@@ -86,3 +86,38 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export type EmbedTestimonial = Pick<
+    Testimonial,
+    'public_id' | 'rating' | 'body' | 'respondent_name' | 'company' | 'title' | 'social_link' | 'photo_url' | 'submitted_at'
+>;
+
+export interface EmbedSpace {
+    public_id: string;
+    name: string;
+    theme: SpaceTheme;
+    logo_url: string | null;
+}
+
+export type DashboardRange = 7 | 30 | 90;
+
+export interface DailyCount {
+    date: string;
+    count: number;
+}
+
+export interface DashboardStats {
+    total_spaces: number;
+    total_testimonials: number;
+    unique_respondents: number;
+    collected_in_range: number;
+    plan: PlanInfo;
+    usage: {
+        spaces_used: number;
+        max_spaces: number | null;
+        max_testimonials_per_space: number | null;
+    };
+    range: DashboardRange;
+    series: DailyCount[];
+    show_upgrade_banner: boolean;
+}
