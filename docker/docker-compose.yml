@@ -4,6 +4,7 @@ x-app: &app
   build:
     context: ../
     dockerfile: docker/Dockerfile
+    target: dev
   volumes:
     - ../codes:/app
     - /app/vendor
