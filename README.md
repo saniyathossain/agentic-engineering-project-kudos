@@ -3,7 +3,7 @@
 Capstone for the Agentic Engineering course (Module 13), built with Claude Code.
 Laravel 13 + Inertia 3 React (TypeScript) + Postgres 18 + Stripe (Cashier, test mode), all in Docker. Latest stable of every part of the stack (PHP 8.5, Node 26, Vite 8, nginx 1.31); two packages are held back on purpose, see [CLAUDE.md](CLAUDE.md#versions).
 
-Requirements: [docs/prd.md](docs/prd.md) · Data model: [docs/data-model.md](docs/data-model.md) · Screenshots: [docs/screenshots/](docs/screenshots/)
+Requirements: [docs/prd.md](docs/prd.md) · Data model: [docs/data-model.md](docs/data-model.md) · Screenshots: generated locally into `docs/screenshots/` (git-ignored)
 
 ## Run it
 
@@ -97,7 +97,7 @@ Fraunces serif for headlines and quotes with Instrument Sans for the UI. Liquid 
 content sits on translucent panes. CSS-only motion (staggered rise, button lift/press, drifting hero cards), disabled under `prefers-reduced-motion`
 and `prefers-reduced-transparency`. Lucide icons throughout, no emoji, no gradient text. Space themes (light/dark/brand) are the owner's choice on the public page and embed.
 Theme toggle (light / dark / system) is in the app header, auth pages and landing page. Layouts were checked at desktop and phone width.
-Frosted chrome (`.frost`), chips, a dependency-free date picker (inbox date-range filter), placeholders and skeletons, animated Lucide icons that act out their meaning on hover (all transform/opacity, off under reduced motion). Screenshots: [docs/screenshots/readme/](docs/screenshots/readme/) (curated, tracked). The full capture set (every page, light and dark, desktop and mobile) is written to `docs/screenshots/all/`, which is git- and Docker-ignored. A 30 fps product tour is in [docs/demo/kudos-tour.mp4](docs/demo/kudos-tour.mp4); `scripts/demo/record.sh` re-records it against the production-style stack.
+Frosted chrome (`.frost`), chips, a dependency-free date picker (inbox date-range filter), placeholders and skeletons, animated Lucide icons that act out their meaning on hover (all transform/opacity, off under reduced motion). Screenshots (every page, light and dark, desktop and mobile) are generated artefacts: they live in `docs/screenshots/`, which is git- and Docker-ignored, so attach them to the submission rather than the repo. A 30 fps product tour is in [docs/demo/kudos-tour.mp4](docs/demo/kudos-tour.mp4); `scripts/demo/record.sh` re-records it against the production-style stack.
 
 ## Code standards
 
@@ -115,7 +115,7 @@ early returns, one component per file on the frontend. Details in [CLAUDE.md](CL
 | **Parallel work + merge** | Branch `worktree-agent-…` (embed + dashboard) merged with `--no-ff` into `main`; conflicts in `package.json`/lockfile resolved by hand. See `git log --graph`. |
 | **Skill** | `.claude/skills/verify-feature/SKILL.md` (tests → Pint → Larastan → on-plan diff → UI smoke → critic). |
 | **Hooks** | `scripts/hooks/protect-env.sh` (PreToolUse: blocks edits to env files) and `pint-on-edit.sh` (PostToolUse), wired in `.claude/settings.json`. |
-| **MCP** | Playwright MCP configured in `.mcp.json`; UI verification in this build used the desktop app's built-in browser (screenshots in `docs/screenshots/readme/`). |
+| **MCP** | Playwright MCP configured in `.mcp.json`; UI verification in this build used the desktop app's built-in browser (screenshots in `docs/screenshots/`, not committed). |
 | **CLAUDE.md** | Commands, layout and rules, including the coding standards. |
 
 ## Reflection (draft — edit before submitting)

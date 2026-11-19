@@ -59,6 +59,7 @@ docs/performance/*.report.html
 *.swp
 *.log
 
-# full screenshot capture set (every page, light/dark, desktop/mobile): regenerate locally; only docs/screenshots/readme/ is tracked
-docs/screenshots/all/
+# screenshots are generated artefacts: never committed, never shipped (regenerate locally)
+docs/screenshots/*
+!docs/screenshots/.gitkeep
 .tmp-demo/
