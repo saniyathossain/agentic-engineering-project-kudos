@@ -2,10 +2,11 @@ import CopyButton from '@/components/copy-button';
 import EmbedSnippet from '@/components/embed-snippet';
 import FlashMessage from '@/components/flash-message';
 import PageHeader from '@/components/page-header';
+import DateRangeFilter from '@/components/spaces/date-range-filter';
 import TestimonialCard from '@/components/spaces/testimonial-card';
 import { Button } from '@/components/ui/button';
+import { Chip } from '@/components/ui/chip';
 import AppLayout from '@/layouts/app-layout';
-import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type Space, type Testimonial } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { ExternalLink, Pencil, Trash2 } from 'lucide-react';
@@ -22,6 +23,7 @@ interface ShowProps {
     space: Space;
     testimonials: Paginated<Testimonial>;
     filter: InboxFilter;
+    range: { from: string | null; to: string | null };
     counts: Record<InboxFilter, number>;
     publicUrl: string;
 }
@@ -34,7 +36,7 @@ const FILTERS: ReadonlyArray<{ value: InboxFilter; label: string }> = [
     { value: 'hidden', label: 'Hidden' },
 ];
 
-export default function Show({ space, testimonials, filter, counts, publicUrl }: ShowProps) {
+export default function Show({ space, testimonials, filter, range, counts, publicUrl }: ShowProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Spaces', href: '/spaces' },
         { title: space.name, href: route('spaces.show', space.public_id) },
@@ -53,12 +55,12 @@ export default function Show({ space, testimonials, filter, counts, publicUrl }:
                             <CopyButton text={publicUrl} label="Copy link" />
                             <Button asChild variant="outline" size="sm">
                                 <a href={publicUrl} target="_blank" rel="noreferrer">
-                                    <ExternalLink strokeWidth={1.75} /> Visit
+                                    <ExternalLink strokeWidth={1.75} className="ico-up-right" /> Visit
                                 </a>
                             </Button>
                             <Button asChild variant="outline" size="sm">
                                 <Link href={route('spaces.edit', space.public_id)}>
-                                    <Pencil strokeWidth={1.75} /> Edit
+                                    <Pencil strokeWidth={1.75} className="ico-pencil" /> Edit
                                 </Link>
                             </Button>
                             <Button
@@ -70,7 +72,7 @@ export default function Show({ space, testimonials, filter, counts, publicUrl }:
                                     router.delete(route('spaces.destroy', space.public_id))
                                 }
                             >
-                                <Trash2 strokeWidth={1.75} />
+                                <Trash2 strokeWidth={1.75} className="ico-trash" />
                             </Button>
                         </>
                     }
@@ -84,22 +86,28 @@ export default function Show({ space, testimonials, filter, counts, publicUrl }:
                     <EmbedSnippet publicId={space.public_id} />
                 </section>
 
-                <nav className="bg-muted flex w-fit max-w-full gap-1 overflow-x-auto rounded-xl p-1" aria-label="Inbox filters">
-                    {FILTERS.map(({ value, label }) => (
-                        <Link
-                            key={value}
-                            href={route('spaces.show', { space: space.public_id, filter: value })}
-                            preserveScroll
-                            aria-current={filter === value ? 'page' : undefined}
-                            className={cn(
-                                'rounded-lg px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-[background-color,color,box-shadow] duration-200',
-                                filter === value ? 'bg-card text-foreground shadow-(--sh-sm)' : 'text-muted-foreground hover:text-foreground',
-                            )}
-                        >
-                            {label} <span className="text-muted-foreground tabular-nums">{counts[value]}</span>
-                        </Link>
-                    ))}
-                </nav>
+                <div className="flex flex-col gap-3">
+                    <nav className="flex flex-wrap gap-2" aria-label="Inbox filters">
+                        {FILTERS.map(({ value, label }) => (
+                            <Chip key={value} asChild selected={filter === value} tone="outline" className="px-3 py-1.5 text-sm">
+                                <Link
+                                    href={route('spaces.show', {
+                                        space: space.public_id,
+                                        filter: value,
+                                        ...(range.from && { from: range.from }),
+                                        ...(range.to && { to: range.to }),
+                                    })}
+                                    preserveScroll
+                                    aria-current={filter === value ? 'page' : undefined}
+                                >
+                                    {label}
+                                    <span className="tabular-nums opacity-70">{counts[value]}</span>
+                                </Link>
+                            </Chip>
+                        ))}
+                    </nav>
+                    <DateRangeFilter spaceId={space.public_id} filter={filter} from={range.from} to={range.to} />
+                </div>
 
                 {testimonials.data.length === 0 ? (
                     <div className="pane rise rounded-2xl px-6 py-14 text-center">

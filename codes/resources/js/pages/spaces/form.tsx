@@ -4,10 +4,12 @@ import CollectionCard from '@/components/spaces/collection-card';
 import OptionalFieldRow from '@/components/spaces/optional-field-row';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Chip } from '@/components/ui/chip';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type FieldConfig, type FieldsConfig, type OptionalFieldKey, type Space, type SpaceTheme } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { type FormEventHandler, useMemo } from 'react';
@@ -39,6 +41,12 @@ const FIELD_LABELS: Record<OptionalFieldKey, string> = {
     title: 'Job title',
     social_link: 'Social link',
     photo: 'Profile photo',
+};
+
+const THEME_SWATCH: Record<SpaceTheme, string> = {
+    light: 'bg-[oklch(0.975_0.011_78)]',
+    dark: 'bg-[oklch(0.24_0.013_55)]',
+    brand: 'bg-[oklch(0.6_0.14_40)]',
 };
 
 const EMPTY_FIELD: FieldConfig = { enabled: false, required: false };
@@ -87,7 +95,13 @@ export default function SpaceForm({ space, themes, optionalFields }: FormProps) 
                     <form onSubmit={submit} className="pane rise space-y-5 rounded-2xl p-5 sm:p-6" aria-label="Space settings">
                         <div className="grid gap-1.5">
                             <Label htmlFor="name">Space name *</Label>
-                            <Input id="name" required value={data.name} onChange={(e) => setData('name', e.target.value)} />
+                            <Input
+                                id="name"
+                                required
+                                placeholder="e.g. Agentic Engineering Course"
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                            />
                             <InputError message={errors.name} />
                         </div>
                         <div className="grid gap-1.5">
@@ -95,7 +109,7 @@ export default function SpaceForm({ space, themes, optionalFields }: FormProps) 
                             <Input
                                 id="header_title"
                                 required
-                                placeholder="Would you recommend us?"
+                                placeholder="e.g. Would you recommend the course?"
                                 value={data.header_title}
                                 onChange={(e) => setData('header_title', e.target.value)}
                             />
@@ -103,7 +117,13 @@ export default function SpaceForm({ space, themes, optionalFields }: FormProps) 
                         </div>
                         <div className="grid gap-1.5">
                             <Label htmlFor="message">Custom message * (Markdown supported)</Label>
-                            <Textarea id="message" required value={data.message} onChange={(e) => setData('message', e.target.value)} />
+                            <Textarea
+                                id="message"
+                                required
+                                placeholder="Write a warm note: what should people tell you about?"
+                                value={data.message}
+                                onChange={(e) => setData('message', e.target.value)}
+                            />
                             <InputError message={errors.message} />
                         </div>
                         <div className="grid gap-1.5">
@@ -133,18 +153,28 @@ export default function SpaceForm({ space, themes, optionalFields }: FormProps) 
 
                         <div className="grid gap-1.5">
                             <Label>Theme</Label>
-                            <div className="flex gap-2" role="radiogroup" aria-label="Theme">
+                            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Theme">
                                 {themes.map((theme) => (
-                                    <Button
+                                    <Chip
                                         key={theme.value}
-                                        type="button"
-                                        role="radio"
-                                        aria-checked={data.theme === theme.value}
-                                        variant={data.theme === theme.value ? 'default' : 'outline'}
-                                        onClick={() => setData('theme', theme.value)}
+                                        asChild
+                                        selected={data.theme === theme.value}
+                                        tone="outline"
+                                        className="px-3 py-1.5 text-sm"
                                     >
-                                        {theme.label}
-                                    </Button>
+                                        <button
+                                            type="button"
+                                            role="radio"
+                                            aria-checked={data.theme === theme.value}
+                                            onClick={() => setData('theme', theme.value)}
+                                        >
+                                            <span
+                                                aria-hidden="true"
+                                                className={cn('size-3 rounded-full border border-current/30', THEME_SWATCH[theme.value])}
+                                            />
+                                            {theme.label}
+                                        </button>
+                                    </Chip>
                                 ))}
                             </div>
                             <InputError message={errors.theme} />

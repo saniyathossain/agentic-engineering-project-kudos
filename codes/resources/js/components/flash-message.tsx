@@ -18,7 +18,7 @@ export default function FlashMessage() {
     if (flash.success) {
         return (
             <Alert role="status" className="animate-pop">
-                <CircleCheck className="text-success size-4" strokeWidth={1.75} />
+                <CircleCheck className="ico-draw text-success size-4" strokeWidth={1.75} />
                 <AlertDescription>{flash.success}</AlertDescription>
             </Alert>
         );

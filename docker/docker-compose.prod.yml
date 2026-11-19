@@ -30,6 +30,7 @@ services:
       APP_ROLE: web
     expose: ["9000"]
     mem_limit: ${APP_MEM_LIMIT:-512m}
+    memswap_limit: ${APP_MEM_LIMIT:-512m}
     cpus: ${APP_CPUS:-1.5}
     pids_limit: 256
     healthcheck:
@@ -54,6 +55,8 @@ services:
     cap_add: [CHOWN, SETUID, SETGID]
     security_opt: ["no-new-privileges:true"]
     mem_limit: 128m
+    memswap_limit: 128m
+    cpus: 0.5
     pids_limit: 128
     networks: [kudos-net]
     healthcheck:
@@ -69,7 +72,9 @@ services:
       APP_ROLE: queue
     command: ["php", "artisan", "queue:work", "--tries=3", "--sleep=2", "--max-time=3600"]
     mem_limit: 256m
+    memswap_limit: 256m
     cpus: 0.5
+    pids_limit: 128
     stop_grace_period: 60s
     healthcheck:
       test: ["CMD-SHELL", "pgrep -f 'artisan queue:work' >/dev/null || exit 1"]
@@ -83,7 +88,9 @@ services:
       APP_ROLE: scheduler
     command: ["php", "artisan", "schedule:work"]
     mem_limit: 128m
+    memswap_limit: 128m
     cpus: 0.25
+    pids_limit: 64
 
   vite:
     profiles: ["disabled-in-prod"]
@@ -96,7 +103,10 @@ services:
     env_file: .envs/app.prod.env
     environment: !override
       POSTGRES_DB: ${DB_DATABASE:-kudos}
-    mem_limit: 512m
+    mem_limit: ${DB_MEM_LIMIT:-512m}
+    memswap_limit: ${DB_MEM_LIMIT:-512m}
+    cpus: ${DB_CPUS:-1.0}
+    pids_limit: 200
     restart: always
 
 volumes:

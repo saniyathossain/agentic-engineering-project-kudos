@@ -22,11 +22,8 @@ export default function StarRating({ value, onChange, className }: StarRatingPro
                 const filled = star <= (value ?? 0);
                 const icon = (
                     <Star
-                        className={cn(
-                            'size-5 transition-transform duration-200',
-                            filled ? 'fill-current' : 'opacity-40',
-                            onChange && 'hover:scale-110',
-                        )}
+                        key={`${star}-${filled}`}
+                        className={cn('size-5', filled ? 'fill-current' : 'opacity-40', onChange && star === value && 'star-picked')}
                         strokeWidth={1.5}
                     />
                 );

@@ -89,7 +89,7 @@ export default function Welcome() {
                         <div className="rise flex flex-wrap gap-3" style={{ '--i': 3 } as CSSProperties}>
                             <Button asChild size="lg">
                                 <Link href={auth.user ? route('dashboard') : route('register')}>
-                                    {auth.user ? 'Open dashboard' : 'Create your first space'} <ArrowRight strokeWidth={1.75} />
+                                    {auth.user ? 'Open dashboard' : 'Create your first space'} <ArrowRight strokeWidth={1.75} className="ico-right" />
                                 </Link>
                             </Button>
                             {!auth.user && (

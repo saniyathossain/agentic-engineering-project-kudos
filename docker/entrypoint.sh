@@ -1,33 +1,54 @@
 #!/bin/bash
+# Dev entrypoint. The bind-mounted codes/.env is shared by app, queue and vite, so exactly one container
+# (the one with SETUP_ENV=1, the app) writes it, atomically; the others wait for it. flock is not reliable
+# across containers on bind mounts, so no lock is used.
 set -e
 cd /app
 if [ ! -f artisan ]; then
   echo "No Laravel app in /app (codes/). Scaffold it first."; exec "$@"
 fi
 
+# each service has its own vendor volume: reinstall whenever composer.lock changed since that volume was filled
+lock_hash="$(md5sum composer.lock | cut -d' ' -f1)"
+if [ ! -f vendor/autoload.php ] || [ "$(cat vendor/.lock-hash 2>/dev/null)" != "$lock_hash" ]; then
+  composer install --no-interaction --prefer-dist
+  echo "$lock_hash" > vendor/.lock-hash
+fi
+
 setup_env() {
-  [ -f vendor/autoload.php ] || composer install --no-interaction --prefer-dist
-  [ -f .env ] || cp .env.example .env
-  # artisan serve ignores container env, so merge docker/.envs/app.env into .env
+  local current=".env"
+  [ -f "$current" ] || current=".env.example"
+  cp "$current" .env.new
   if [ -f /run/app.env ]; then
     while IFS= read -r line; do
       case "$line" in ''|\#*) continue ;; esac
       key="${line%%=*}"; val="${line#*=}"
-      if grep -q "^${key}=" .env; then
-        awk -v k="$key" -v v="$val" 'BEGIN{FS=OFS="="} $1==k{print k"="v; next} {print}' .env > .env.tmp && cat .env.tmp > .env && rm -f .env.tmp
+      if grep -q "^${key}=" .env.new; then
+        awk -v k="$key" -v v="$val" 'BEGIN{FS=OFS="="} $1==k{print k"="v; next} {print}' .env.new > .env.tmp && mv .env.tmp .env.new
       else
-        printf '%s=%s\n' "$key" "$val" >> .env
+        printf '%s=%s\n' "$key" "$val" >> .env.new
       fi
     done < /run/app.env
   fi
-  grep -q '^APP_KEY=.\+' .env || php artisan key:generate --force
+  if ! grep -q '^APP_KEY=.\+' .env.new; then
+    key="base64:$(php -r 'echo base64_encode(random_bytes(32));')"
+    if grep -q '^APP_KEY=' .env.new; then
+      awk -v v="$key" 'BEGIN{FS=OFS="="} $1=="APP_KEY"{print "APP_KEY="v; next} {print}' .env.new > .env.tmp && mv .env.tmp .env.new
+    else
+      printf 'APP_KEY=%s\n' "$key" >> .env.new
+    fi
+  fi
+  mv .env.new .env   # atomic: readers never see a half-written file
 }
 
-# app/queue/vite start together on a shared bind mount: serialize setup
-exec 9>/app/.setup.lock
-flock 9
-setup_env
-flock -u 9
+if [ "${SETUP_ENV:-0}" = "1" ]; then
+  setup_env
+else
+  for _ in $(seq 1 60); do
+    grep -q '^APP_KEY=.\+' .env 2>/dev/null && break
+    sleep 1
+  done
+fi
 
 if [ "${RUN_MIGRATIONS:-0}" = "1" ]; then
   until php artisan migrate --force 2>/dev/null; do echo "waiting for db..."; sleep 2; done

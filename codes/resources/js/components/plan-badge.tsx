@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { Chip } from '@/components/ui/chip';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Sparkles } from 'lucide-react';
@@ -12,10 +12,10 @@ export default function PlanBadge() {
 
     return (
         <Link href="/billing" aria-label={`${plan.label} plan, open billing`}>
-            <Badge variant={plan.value === 'pro' ? 'default' : 'secondary'} className="gap-1">
-                {plan.value === 'pro' && <Sparkles className="size-3" strokeWidth={1.75} />}
+            <Chip tone={plan.value === 'pro' ? 'accent' : 'neutral'} interactive>
+                {plan.value === 'pro' && <Sparkles className="ico-sparkles-idle size-3" strokeWidth={1.75} />}
                 {plan.label}
-            </Badge>
+            </Chip>
         </Link>
     );
 }

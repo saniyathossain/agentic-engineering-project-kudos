@@ -21,7 +21,7 @@ make dev                                               # build + start (migrates
 | Vite dev server | http://localhost:5180 |
 
 Demo login (seeded, local only): `demo@kudos.test` / `password`.
-Ports are bound to 127.0.0.1; override with `APP_PORT`, `VITE_PORT`, `DB_PORT`, `MAILPIT_PORT`.
+Every service has CPU, memory, swap and pids limits (override with `APP_MEM_LIMIT`, `APP_CPUS`, `QUEUE_*`, `VITE_*`, `DB_*`). Ports are bound to 127.0.0.1; override with `APP_PORT`, `VITE_PORT`, `DB_PORT`, `MAILPIT_PORT`.
 
 ```bash
 make test    # PHPUnit (sqlite in-memory)
@@ -73,7 +73,7 @@ Fraunces serif for headlines and quotes with Instrument Sans for the UI. Liquid 
 content sits on translucent panes. CSS-only motion (staggered rise, button lift/press, drifting hero cards), disabled under `prefers-reduced-motion`
 and `prefers-reduced-transparency`. Lucide icons throughout, no emoji, no gradient text. Space themes (light/dark/brand) are the owner's choice on the public page and embed.
 Theme toggle (light / dark / system) is in the app header, auth pages and landing page. Layouts were checked at desktop and phone width.
-Current screenshots: `docs/screenshots/design-*.jpg`.
+Frosted chrome (`.frost`), chips, a dependency-free date picker (inbox date-range filter), placeholders and skeletons, animated Lucide icons that act out their meaning on hover (all transform/opacity, off under reduced motion). Current screenshots: `docs/screenshots/design-*.jpg`.
 
 ## Code standards
 

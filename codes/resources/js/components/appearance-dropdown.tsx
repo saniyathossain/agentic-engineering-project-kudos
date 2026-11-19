@@ -10,11 +10,11 @@ export default function AppearanceToggleDropdown({ className = '', ...props }: H
     const getCurrentIcon = () => {
         switch (appearance) {
             case 'dark':
-                return <Moon className="h-5 w-5" />;
+                return <Moon key="moon" className="ico-moon ico-swap h-5 w-5" strokeWidth={1.75} />;
             case 'light':
-                return <Sun className="h-5 w-5" />;
+                return <Sun key="sun" className="ico-sun ico-swap h-5 w-5" strokeWidth={1.75} />;
             default:
-                return <Monitor className="h-5 w-5" />;
+                return <Monitor key="monitor" className="ico-swap h-5 w-5" strokeWidth={1.75} />;
         }
     };
 
@@ -22,7 +22,7 @@ export default function AppearanceToggleDropdown({ className = '', ...props }: H
         <div className={className} {...props}>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-md">
+                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl">
                         {getCurrentIcon()}
                         <span className="sr-only">Toggle theme</span>
                     </Button>

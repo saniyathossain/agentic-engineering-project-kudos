@@ -81,4 +81,27 @@ final class InboxTest extends TestCase
         $this->actingAs($intruder)->delete($base)->assertForbidden();
         $this->assertSame(TestimonialStatus::Pending, $testimonial->refresh()->status);
     }
+
+    public function test_inbox_filters_by_date_range_inclusive(): void
+    {
+        Testimonial::factory()->for($this->space)->create(['submitted_at' => '2026-11-01 09:00:00']);
+        Testimonial::factory()->for($this->space)->create(['submitted_at' => '2026-11-10 23:30:00']);
+        Testimonial::factory()->for($this->space)->create(['submitted_at' => '2026-11-20 08:00:00']);
+        $url = "/spaces/{$this->space->public_id}";
+
+        $this->actingAs($this->owner)->get("$url?from=2026-11-05&to=2026-11-10")
+            ->assertInertia(fn ($p) => $p->has('testimonials.data', 1)->where('range.from', '2026-11-05')->where('range.to', '2026-11-10'));
+        $this->actingAs($this->owner)->get("$url?from=2026-11-10")
+            ->assertInertia(fn ($p) => $p->has('testimonials.data', 2));
+        $this->actingAs($this->owner)->get("$url?to=2026-11-01")
+            ->assertInertia(fn ($p) => $p->has('testimonials.data', 1));
+    }
+
+    public function test_invalid_date_range_is_rejected(): void
+    {
+        $url = "/spaces/{$this->space->public_id}";
+
+        $this->actingAs($this->owner)->get("$url?from=not-a-date")->assertSessionHasErrors('from');
+        $this->actingAs($this->owner)->get("$url?from=2026-11-10&to=2026-11-01")->assertSessionHasErrors('to');
+    }
 }

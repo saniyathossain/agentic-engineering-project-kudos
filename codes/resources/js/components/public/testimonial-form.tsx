@@ -27,10 +27,10 @@ type FormState = {
     consent: boolean;
 };
 
-const TEXT_FIELDS: ReadonlyArray<{ key: Exclude<OptionalFieldKey, 'photo'>; label: string; type: string }> = [
-    { key: 'company', label: 'Company', type: 'text' },
-    { key: 'title', label: 'Job title', type: 'text' },
-    { key: 'social_link', label: 'Social link', type: 'url' },
+const TEXT_FIELDS: ReadonlyArray<{ key: Exclude<OptionalFieldKey, 'photo'>; label: string; type: string; placeholder: string }> = [
+    { key: 'company', label: 'Company', type: 'text', placeholder: 'Where do you work?' },
+    { key: 'title', label: 'Job title', type: 'text', placeholder: 'Your role' },
+    { key: 'social_link', label: 'Social link', type: 'url', placeholder: 'https://' },
 ];
 
 export default function TestimonialForm({ space }: TestimonialFormProps) {
@@ -64,7 +64,14 @@ export default function TestimonialForm({ space }: TestimonialFormProps) {
 
             <div className="grid gap-1.5">
                 <Label htmlFor="body">Your testimonial *</Label>
-                <Textarea id="body" required value={data.body} onChange={(e) => setData('body', e.target.value)} className={theme.input} />
+                <Textarea
+                    id="body"
+                    required
+                    placeholder="What was it like working with us?"
+                    value={data.body}
+                    onChange={(e) => setData('body', e.target.value)}
+                    className={theme.input}
+                />
                 <InputError message={errors.body} />
             </div>
 
@@ -96,7 +103,7 @@ export default function TestimonialForm({ space }: TestimonialFormProps) {
                 </div>
             </div>
 
-            {TEXT_FIELDS.filter(({ key }) => space.fields[key].enabled).map(({ key, label, type }) => (
+            {TEXT_FIELDS.filter(({ key }) => space.fields[key].enabled).map(({ key, label, type, placeholder }) => (
                 <div key={key} className="grid gap-1.5">
                     <Label htmlFor={key}>
                         {label}
@@ -105,6 +112,7 @@ export default function TestimonialForm({ space }: TestimonialFormProps) {
                     <Input
                         id={key}
                         type={type}
+                        placeholder={placeholder}
                         required={space.fields[key].required}
                         value={data[key]}
                         onChange={(e) => setData(key, e.target.value)}

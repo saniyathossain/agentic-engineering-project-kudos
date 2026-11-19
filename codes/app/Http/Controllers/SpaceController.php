@@ -11,6 +11,7 @@ use App\Enums\InboxFilter;
 use App\Enums\OptionalField;
 use App\Enums\SpaceTheme;
 use App\Exceptions\PlanLimitReached;
+use App\Http\Requests\Spaces\InboxRequest;
 use App\Http\Requests\Spaces\SpaceRequest;
 use App\Http\Resources\OwnerTestimonialResource;
 use App\Http\Resources\SpaceResource;
@@ -60,22 +61,25 @@ final class SpaceController extends Controller
         return to_route('spaces.show', $space)->with('success', 'Space created. Share its link to collect testimonials.');
     }
 
-    public function show(Request $request, Space $space): Response
+    public function show(InboxRequest $request, Space $space): Response
     {
         Gate::authorize('manage', $space);
 
-        $filter = InboxFilter::tryFrom((string) $request->query('filter')) ?? InboxFilter::All;
+        $inbox = $request->toData();
         $query = $space->testimonials()->latest('submitted_at');
-        match ($filter) {
+        match ($inbox->filter) {
             InboxFilter::All => null,
             InboxFilter::Favorite => $query->where('is_favorite', true),
-            default => $query->where('status', $filter->value),
+            default => $query->where('status', $inbox->filter->value),
         };
+        $query->when($inbox->from !== null, static fn ($q) => $q->where('submitted_at', '>=', $inbox->from));
+        $query->when($inbox->to !== null, static fn ($q) => $q->where('submitted_at', '<=', $inbox->to));
 
         return Inertia::render('spaces/show', [
             'space' => (new SpaceResource($space))->resolve(),
             'testimonials' => OwnerTestimonialResource::collection($query->paginate(15)->withQueryString()),
-            'filter' => $filter->value,
+            'filter' => $inbox->filter->value,
+            'range' => ['from' => $inbox->from?->toDateString(), 'to' => $inbox->to?->toDateString()],
             'counts' => $this->counts($space),
             'publicUrl' => url('/'.$space->slug),
         ]);

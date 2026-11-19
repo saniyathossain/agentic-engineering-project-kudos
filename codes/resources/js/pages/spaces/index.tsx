@@ -18,13 +18,13 @@ export default function Index({ spaces, canCreate }: IndexProps) {
     const action = canCreate ? (
         <Button asChild>
             <Link href={route('spaces.create')}>
-                <Plus strokeWidth={1.75} /> New space
+                <Plus strokeWidth={1.75} className="ico-plus" /> New space
             </Link>
         </Button>
     ) : (
         <Button asChild variant="outline">
             <Link href={route('billing.show')}>
-                <Sparkles strokeWidth={1.75} /> More spaces with Pro
+                <Sparkles strokeWidth={1.75} className="ico-sparkles" /> More spaces with Pro
             </Link>
         </Button>
     );

@@ -4,11 +4,12 @@ import SubmissionsChart from '@/components/dashboard/submissions-chart';
 import UpgradeBanner from '@/components/dashboard/upgrade-banner';
 import PageHeader from '@/components/page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type DashboardRange, type DashboardStats } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { CreditCard, LayoutGrid, MessageSquareQuote, Users } from 'lucide-react';
-import { type CSSProperties } from 'react';
+import { type CSSProperties, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -24,8 +25,20 @@ interface DashboardProps {
 const limitLabel = (used: number, max: number | null): string => `${used} / ${max ?? 'unlimited'}`;
 
 export default function Dashboard({ stats }: DashboardProps) {
+    const [loading, setLoading] = useState(false);
     const changeRange = (range: DashboardRange) =>
-        router.get('/dashboard', { range }, { only: ['stats'], preserveState: true, preserveScroll: true, replace: true });
+        router.get(
+            '/dashboard',
+            { range },
+            {
+                only: ['stats'],
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+                onStart: () => setLoading(true),
+                onFinish: () => setLoading(false),
+            },
+        );
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -52,9 +65,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                         </CardTitle>
                         <RangeToggle value={stats.range} onChange={changeRange} />
                     </CardHeader>
-                    <CardContent>
-                        <SubmissionsChart series={stats.series} />
-                    </CardContent>
+                    <CardContent>{loading ? <Skeleton className="h-64 w-full" /> : <SubmissionsChart series={stats.series} />}</CardContent>
                 </Card>
             </div>
         </AppLayout>

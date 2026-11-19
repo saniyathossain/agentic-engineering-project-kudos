@@ -1,6 +1,6 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Chip } from '@/components/ui/chip';
 import { type Space } from '@/types';
 import { Link } from '@inertiajs/react';
 import { ArrowUpRight, MessageSquareQuote, Pencil } from 'lucide-react';
@@ -22,7 +22,9 @@ export default function SpaceCard({ space, index }: SpaceCardProps) {
                     <h2 className="font-display truncate text-xl font-medium">{space.name}</h2>
                     <p className="text-muted-foreground truncate text-sm">/{space.slug}</p>
                 </div>
-                <Badge variant={space.is_accepting ? 'default' : 'secondary'}>{space.is_accepting ? 'Collecting' : 'Paused'}</Badge>
+                <Chip tone={space.is_accepting ? 'success' : 'neutral'} dot>
+                    {space.is_accepting ? 'Collecting' : 'Paused'}
+                </Chip>
             </div>
             <p className="text-muted-foreground flex items-center gap-2 text-sm">
                 <MessageSquareQuote className="size-4" strokeWidth={1.75} />
@@ -31,12 +33,12 @@ export default function SpaceCard({ space, index }: SpaceCardProps) {
             <div className="mt-auto flex gap-2">
                 <Button asChild size="sm">
                     <Link href={route('spaces.show', space.public_id)}>
-                        Open inbox <ArrowUpRight strokeWidth={1.75} />
+                        Open inbox <ArrowUpRight strokeWidth={1.75} className="ico-up-right" />
                     </Link>
                 </Button>
                 <Button asChild size="sm" variant="outline">
                     <Link href={route('spaces.edit', space.public_id)}>
-                        <Pencil strokeWidth={1.75} /> Edit
+                        <Pencil strokeWidth={1.75} className="ico-pencil" /> Edit
                     </Link>
                 </Button>
             </div>

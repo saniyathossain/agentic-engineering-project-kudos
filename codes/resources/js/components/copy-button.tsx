@@ -12,7 +12,7 @@ export default function CopyButton({ text, label = 'Copy' }: CopyButtonProps) {
 
     return (
         <Button type="button" variant="outline" size="sm" onClick={() => void copy(text)}>
-            {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+            {copied ? <Check key="done" className="ico-swap ico-draw size-4" /> : <Copy key="idle" className="size-4" />}
             {copied ? 'Copied' : label}
         </Button>
     );

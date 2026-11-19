@@ -24,18 +24,40 @@ services:
       - "127.0.0.1:${APP_PORT:-8010}:8000"
     environment:
       RUN_MIGRATIONS: "1"
+      SETUP_ENV: "1"
+    mem_limit: ${APP_MEM_LIMIT:-768m}
+    memswap_limit: ${APP_MEM_LIMIT:-768m}
+    cpus: ${APP_CPUS:-1.0}
+    pids_limit: 256
 
   queue:
     <<: *app
     command: ["php", "artisan", "queue:work", "--tries=3", "--sleep=2"]
+    mem_limit: ${QUEUE_MEM_LIMIT:-384m}
+    memswap_limit: ${QUEUE_MEM_LIMIT:-384m}
+    cpus: ${QUEUE_CPUS:-0.5}
+    pids_limit: 128
 
   vite:
     <<: *app
     environment:
       VITE_DEV_ORIGIN: http://localhost:${VITE_PORT:-5180}
-    command: ["sh", "-c", "[ -d node_modules/.bin ] || npm install; npm run dev -- --host 0.0.0.0"]
+    # reinstall when package-lock.json changed since this service's node_modules volume was filled
+    command:
+      - sh
+      - -c
+      - |
+        h=$$(md5sum package-lock.json | cut -d' ' -f1)
+        if [ "$$(cat node_modules/.lock-hash 2>/dev/null)" != "$$h" ]; then
+          npm ci --no-audit --no-fund && echo "$$h" > node_modules/.lock-hash
+        fi
+        exec npm run dev -- --host 0.0.0.0
     ports:
       - "127.0.0.1:${VITE_PORT:-5180}:5173"
+    mem_limit: ${VITE_MEM_LIMIT:-1g}
+    memswap_limit: ${VITE_MEM_LIMIT:-1g}
+    cpus: ${VITE_CPUS:-1.0}
+    pids_limit: 512
 
   db:
     image: postgres:17-alpine
@@ -47,6 +69,11 @@ services:
       - db-data:/var/lib/postgresql/data
     ports:
       - "127.0.0.1:${DB_PORT:-5440}:5432"
+    mem_limit: ${DB_MEM_LIMIT:-512m}
+    memswap_limit: ${DB_MEM_LIMIT:-512m}
+    cpus: ${DB_CPUS:-1.0}
+    pids_limit: 200
+    shm_size: 128m
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-kudos} -d ${DB_DATABASE:-kudos}"]
       interval: 5s
@@ -59,6 +86,10 @@ services:
     image: axllent/mailpit:latest
     ports:
       - "127.0.0.1:${MAILPIT_PORT:-8030}:8025"
+    mem_limit: 128m
+    memswap_limit: 128m
+    cpus: 0.25
+    pids_limit: 64
     networks:
       - kudos-net
 
@@ -66,6 +97,10 @@ services:
     image: stripe/stripe-cli:latest
     profiles: ["billing"]
     command: ["listen", "--api-key", "${STRIPE_SECRET:-}", "--forward-to", "http://app:8000/stripe/webhook"]
+    mem_limit: 128m
+    memswap_limit: 128m
+    cpus: 0.25
+    pids_limit: 64
     networks:
       - kudos-net
 

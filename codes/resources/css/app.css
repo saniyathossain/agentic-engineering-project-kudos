@@ -30,7 +30,10 @@
     --color-accent-foreground: var(--accent-foreground);
     --color-destructive: var(--destructive);
     --color-destructive-foreground: var(--destructive-foreground);
+    --color-ink-2: var(--ink-2);
+    --color-ink-3: var(--ink-3);
     --color-success: var(--success);
+    --color-warning: var(--warning);
     --color-star: var(--star);
     --color-border: var(--border);
     --color-input: var(--input);
@@ -78,7 +81,9 @@
         background-color: var(--background);
         color: var(--foreground);
         font-feature-settings: 'ss01', 'cv11';
-        transition: background-color var(--dur-base) var(--ease-in-soft), color var(--dur-base) var(--ease-in-soft);
+        transition:
+            background-color var(--dur-base) var(--ease-in-soft),
+            color var(--dur-base) var(--ease-in-soft);
     }
 
     /* ambient light behind everything: two faint washes, fixed so scrolling stays cheap */
@@ -89,6 +94,8 @@
         z-index: -1;
         pointer-events: none;
         background:
+            radial-gradient(18rem 18rem at 78% 12%, var(--orb-warm), transparent 70%),
+            radial-gradient(22rem 22rem at 12% 78%, var(--orb-cool), transparent 70%),
             radial-gradient(60rem 40rem at 90% -10%, var(--amb-warm), transparent 70%),
             radial-gradient(50rem 36rem at -10% 110%, var(--amb-cool), transparent 70%);
     }
@@ -97,6 +104,11 @@
     h2,
     h3 {
         text-wrap: balance;
+    }
+
+    ::placeholder {
+        color: var(--ink-3);
+        opacity: 1;
     }
 
     ::selection {
@@ -123,6 +135,9 @@
     --background: oklch(0.975 0.011 78);
     --foreground: oklch(0.22 0.02 50);
     --muted-foreground: oklch(0.46 0.02 55);
+    --ink-2: oklch(0.38 0.02 52);
+    --ink-3: oklch(0.56 0.02 56);
+    --warning: oklch(0.5 0.12 70);
 
     /* panes (content) and glass (floating chrome) */
     --card: oklch(1 0 0 / 0.74);
@@ -166,6 +181,8 @@
     --sidebar-border: oklch(0.3 0.03 55 / 0.09);
     --sidebar-ring: oklch(0.54 0.18 35);
 
+    --orb-warm: oklch(0.86 0.09 55 / 0.55);
+    --orb-cool: oklch(0.88 0.06 235 / 0.5);
     --amb-warm: oklch(0.92 0.06 70 / 0.6);
     --amb-cool: oklch(0.93 0.035 235 / 0.5);
 
@@ -180,6 +197,9 @@
     --background: oklch(0.17 0.013 55);
     --foreground: oklch(0.95 0.008 78);
     --muted-foreground: oklch(0.74 0.012 70);
+    --ink-2: oklch(0.84 0.01 72);
+    --ink-3: oklch(0.64 0.012 70);
+    --warning: oklch(0.82 0.13 85);
 
     --card: oklch(0.27 0.013 55 / 0.55);
     --card-foreground: oklch(0.95 0.008 78);
@@ -221,6 +241,8 @@
     --sidebar-border: oklch(1 0 0 / 0.08);
     --sidebar-ring: oklch(0.74 0.15 40);
 
+    --orb-warm: oklch(0.42 0.1 40 / 0.4);
+    --orb-cool: oklch(0.36 0.08 255 / 0.4);
     --amb-warm: oklch(0.34 0.07 40 / 0.35);
     --amb-cool: oklch(0.3 0.05 255 / 0.4);
 
@@ -235,16 +257,18 @@
 @utility pane {
     background: linear-gradient(180deg, var(--glass-hi), transparent 55%), var(--card);
     border: 1px solid var(--border);
-    box-shadow: inset 0 1px 0 var(--glass-spec), var(--sh-md);
+    box-shadow:
+        inset 0 1px 0 var(--glass-spec),
+        var(--sh-md);
 }
 
 /* the one lead card on a page */
 @utility pane-accent {
-    background:
-        linear-gradient(180deg, var(--glass-hi), transparent 55%),
-        color-mix(in oklch, var(--primary) 9%, var(--card));
+    background: linear-gradient(180deg, var(--glass-hi), transparent 55%), color-mix(in oklch, var(--primary) 9%, var(--card));
     border: 1px solid color-mix(in oklch, var(--primary) 26%, var(--border));
-    box-shadow: inset 0 1px 0 var(--glass-spec), var(--sh-md);
+    box-shadow:
+        inset 0 1px 0 var(--glass-spec),
+        var(--sh-md);
 }
 
 /* liquid glass for chrome that content scrolls under: sidebar, top bar, menus, dialogs */
@@ -253,7 +277,9 @@
     -webkit-backdrop-filter: blur(24px) saturate(1.7);
     backdrop-filter: blur(24px) saturate(1.7);
     border: 1px solid var(--glass-rim);
-    box-shadow: inset 0 1px 0 var(--glass-spec), var(--sh-glass);
+    box-shadow:
+        inset 0 1px 0 var(--glass-spec),
+        var(--sh-glass);
 }
 
 @utility font-display {
@@ -279,14 +305,275 @@
     animation-delay: calc(var(--i, 0) * 60ms);
 }
 
+/* frosted glass: glass with a stronger blur and a fine grain, for the few surfaces that float over content */
+@utility frost {
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"),
+        linear-gradient(180deg, var(--glass-hi), transparent 60%), var(--glass);
+    background-blend-mode: soft-light, normal, normal;
+    -webkit-backdrop-filter: blur(32px) saturate(1.8) brightness(1.03);
+    backdrop-filter: blur(32px) saturate(1.8) brightness(1.03);
+    border: 1px solid var(--glass-rim);
+    box-shadow:
+        inset 0 1px 0 var(--glass-spec),
+        var(--sh-glass);
+}
+
+/* typographic shades: primary ink, secondary, tertiary; an eyebrow label; tabular figures */
+@utility eyebrow {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+}
+
+@utility lead {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: var(--ink-2);
+}
+
+/* loading placeholder: a soft light sweeps across (transform only, so it stays on the compositor) */
+@utility skeleton {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    background: color-mix(in oklch, var(--foreground) 7%, transparent);
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, var(--glass-spec), transparent);
+    animation: sweep 1.4s var(--ease-in-soft) infinite;
+}
+
+/* long lists paint only what is on screen */
+@utility cv-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 12rem;
+}
+
+/* ---- animated icons: pressable parents lift their icons; named icons act out their meaning ---- */
+:is(button, a, [role='button'], [role='tab'], [role='menuitem'], [role='radio'], summary, label) > svg {
+    transition: transform 280ms var(--ease-spring);
+    transform-origin: center;
+}
+
+:is(button, a, [role='button'], [role='tab'], [role='menuitem'], [role='radio']):is(:hover, :focus-visible):not(:disabled, [aria-disabled='true'])
+    > svg:not([class*='ico-'], .no-lift) {
+    transform: translate3d(0, -1px, 0) scale(1.1);
+}
+
+:is(button, a, [role='button'], [role='tab']):active > svg:not([class*='ico-']) {
+    transform: scale(0.94);
+    transition-duration: 120ms;
+}
+
+@keyframes ico-nudge-ur {
+    40% {
+        transform: translate(3px, -3px);
+    }
+    70% {
+        transform: translate(-1px, 1px);
+    }
+}
+@keyframes ico-nudge-r {
+    40% {
+        transform: translateX(3px);
+    }
+    70% {
+        transform: translateX(-1px);
+    }
+}
+@keyframes ico-pop {
+    35% {
+        transform: scale(1.35);
+    }
+    65% {
+        transform: scale(0.92);
+    }
+}
+@keyframes ico-wiggle {
+    20% {
+        transform: rotate(-14deg);
+    }
+    45% {
+        transform: rotate(12deg);
+    }
+    70% {
+        transform: rotate(-6deg);
+    }
+}
+@keyframes ico-spin-quarter {
+    to {
+        transform: rotate(90deg);
+    }
+}
+@keyframes ico-tilt {
+    35% {
+        transform: rotate(-18deg) translate(-1px, 1px);
+    }
+    70% {
+        transform: rotate(8deg);
+    }
+}
+@keyframes ico-twinkle {
+    30% {
+        transform: scale(1.25) rotate(18deg);
+    }
+    60% {
+        transform: scale(0.9) rotate(-8deg);
+    }
+}
+@keyframes ico-sun {
+    to {
+        transform: rotate(180deg);
+    }
+}
+@keyframes ico-moon {
+    40% {
+        transform: rotate(-22deg) scale(1.08);
+    }
+    75% {
+        transform: rotate(8deg);
+    }
+}
+@keyframes ico-blink {
+    45%,
+    55% {
+        transform: scaleY(0.15);
+    }
+}
+
+@keyframes ico-nudge-l {
+    40% {
+        transform: translateX(-3px);
+    }
+    70% {
+        transform: translateX(1px);
+    }
+}
+:is(button, a, [role='button']):is(:hover, :focus-visible) > .ico-left {
+    animation: ico-nudge-l 640ms var(--ease-spring);
+}
+:is(button, a, [role='button']):is(:hover, :focus-visible) > .ico-calendar {
+    animation: ico-pop 520ms var(--ease-spring);
+}
+:is(button, a, [role='button'], [role='menuitem']):is(:hover, :focus-visible) > .ico-send {
+    animation: ico-nudge-ur 640ms var(--ease-spring);
+}
+:is(button, a, [role='button']):is(:hover, :focus-visible) > .ico-up-right {
+    animation: ico-nudge-ur 640ms var(--ease-spring);
+}
+:is(button, a, [role='button']):is(:hover, :focus-visible) > .ico-right {
+    animation: ico-nudge-r 640ms var(--ease-spring);
+}
+:is(button, a, [role='button']):is(:hover, :focus-visible) > .ico-heart {
+    animation: ico-pop 520ms var(--ease-spring);
+}
+:is(button, a, [role='button']):is(:hover, :focus-visible) > .ico-trash {
+    animation: ico-wiggle 560ms var(--ease-spring);
+}
+:is(button, a, [role='button']):is(:hover, :focus-visible) > .ico-plus {
+    animation: ico-spin-quarter 420ms var(--ease-spring) both;
+}
+:is(button, a, [role='button']):is(:hover, :focus-visible) > .ico-pencil {
+    animation: ico-tilt 600ms var(--ease-spring);
+}
+:is(button, a, [role='button']):is(:hover, :focus-visible) > .ico-sparkles {
+    animation: ico-twinkle 700ms var(--ease-spring);
+}
+:is(button, a, [role='button'], [role='menuitem']):is(:hover, :focus-visible) .ico-sun {
+    animation: ico-sun 700ms var(--ease-spring);
+}
+:is(button, a, [role='button'], [role='menuitem']):is(:hover, :focus-visible) .ico-moon {
+    animation: ico-moon 700ms var(--ease-spring);
+}
+:is(button, a, [role='button'], [role='menuitem']):is(:hover, :focus-visible) > .ico-eye {
+    animation: ico-blink 600ms ease-in-out;
+}
+
+/* an icon that swaps for another (copy / check, sun / moon) pops in rather than blinking */
+@keyframes swap-in {
+    from {
+        opacity: 0;
+        transform: scale(0.5) rotate(-35deg);
+        filter: blur(2px);
+    }
+    60% {
+        transform: scale(1.12) rotate(4deg);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+        filter: none;
+    }
+}
+.ico-swap {
+    animation: swap-in 360ms var(--ease-spring) both;
+}
+
+/* a status check draws itself */
+@keyframes draw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+.ico-draw path:last-child,
+.ico-draw circle + path {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
+    animation: draw 520ms 120ms var(--ease-liquid) forwards;
+}
+
+/* stars twinkle once when picked */
+.star-picked {
+    animation: ico-twinkle 520ms var(--ease-spring);
+}
+
+/* ---- navigation: content dims a touch while Inertia fetches the next page ---- */
+main,
+[data-slot='content'] {
+    transition: opacity var(--dur-base) var(--ease-in-soft);
+}
+html[data-navigating='true'] main {
+    opacity: 0.72;
+}
+
+@keyframes sweep {
+    to {
+        transform: translateX(100%);
+    }
+}
+@keyframes ico-always-twinkle {
+    0%,
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.18) rotate(14deg);
+        opacity: 0.8;
+    }
+}
+.ico-sparkles-idle {
+    animation: ico-always-twinkle 3.6s ease-in-out infinite;
+}
+
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .glass {
+    .glass,
+    .frost {
         background: var(--popover);
     }
 }
 
 @media (prefers-reduced-transparency: reduce) {
-    .glass {
+    .glass,
+    .frost {
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
         background: var(--popover);

@@ -8,7 +8,7 @@ export default function UpgradeBanner() {
     return (
         <aside className="pane-accent rise flex items-center gap-4 rounded-2xl p-4" aria-label="Upgrade">
             <span className="icon-chip shrink-0">
-                <Sparkles className="size-[18px]" strokeWidth={1.75} />
+                <Sparkles className="ico-sparkles-idle no-lift size-[18px]" strokeWidth={1.75} />
             </span>
             <p className="min-w-0 flex-1 text-sm">
                 <span className="font-medium">Free plan: 1 space, 10 testimonials per space.</span>{' '}

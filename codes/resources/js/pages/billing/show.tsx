@@ -36,7 +36,7 @@ export default function Show({ overview }: { overview: Overview }) {
         )
     ) : (
         <Button onClick={() => router.post(route('billing.checkout'))} disabled={!overview.billing_configured}>
-            <Sparkles strokeWidth={1.75} /> Upgrade to Pro
+            <Sparkles strokeWidth={1.75} className="ico-sparkles" /> Upgrade to Pro
         </Button>
     );
 
