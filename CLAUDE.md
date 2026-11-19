@@ -15,6 +15,15 @@ Minimal Testimonial.to clone. Laravel 12 + Inertia React (starter kit), Postgres
 - Stripe webhooks: `docker compose -f docker/docker-compose.yml --profile billing up stripe`
 - Demo login: demo@kudos.test / password (seeded, local only)
 
+## Coding standards (BE + FE, enforced by critic)
+- PHP: `declare_strict_types`, PSR-12 (Pint `codes/pint.json`), `final` classes, typed props/params/returns, no `mixed`, no loose `==`. Larastan level 8 (`codes/phpstan.neon`; baseline covers starter-kit code only, never add new baseline entries).
+- DTOs: readonly `final` classes in `app/Data/<Domain>/` built from validated FormRequests; controllers pass DTOs to Actions, never raw arrays/`$request->all()`.
+- Enums: backed PHP enums in `app/Enums/` (SpaceTheme, TestimonialStatus, Plan...) for every fixed value; cast on models; mirror as TS union types.
+- Early return / guard clauses; max one nesting level; no `else` after return.
+- DRY + SOLID: single-purpose Action classes (`app/Actions/`), Policies for authorization, constructor injection, interfaces for external services (Stripe gateway). Thin controllers, no business logic in React.
+- TS: `strict` on, no `any`, explicit prop types, shared types in `resources/js/types/`, one component per file, logic in hooks, no duplicated markup (extract component).
+- Names say intent; small functions; comments only for non-obvious why.
+
 ## Rules
 - Never edit `docker/.envs/app.env` or `codes/.env` (hook blocks it); change `app.env.example` and tell the user.
 - Tests use sqlite :memory: via phpunit.xml; the compose service must NOT pass env_file/DB env to the container, or tests hit the dev Postgres.
