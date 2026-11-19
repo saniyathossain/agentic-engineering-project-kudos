@@ -39,7 +39,14 @@ services:
     pids_limit: 128
 
   vite:
-    <<: *app
+    image: node:26-alpine
+    working_dir: /app
+    volumes:
+      - ../codes:/app
+      - /app/node_modules
+    networks:
+      - kudos-net
+    restart: unless-stopped
     environment:
       VITE_DEV_ORIGIN: http://localhost:${VITE_PORT:-5180}
     # reinstall when package-lock.json changed since this service's node_modules volume was filled
@@ -60,13 +67,13 @@ services:
     pids_limit: 512
 
   db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     environment:
       POSTGRES_DB: ${DB_DATABASE:-kudos}
       POSTGRES_USER: ${DB_USERNAME:-kudos}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-kudos}
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql
     ports:
       - "127.0.0.1:${DB_PORT:-5440}:5432"
     mem_limit: ${DB_MEM_LIMIT:-512m}
@@ -83,7 +90,7 @@ services:
       - kudos-net
 
   mailpit:
-    image: axllent/mailpit:latest
+    image: axllent/mailpit:v1.34
     ports:
       - "127.0.0.1:${MAILPIT_PORT:-8030}:8025"
     mem_limit: 128m

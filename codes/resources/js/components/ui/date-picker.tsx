@@ -26,16 +26,14 @@ export default function DatePicker({ value, onChange, label, placeholder = 'Pick
     const gridRef = useRef<HTMLDivElement>(null);
     const today = toDayKey(new Date());
 
-    useEffect(() => {
-        if (!open) {
-            return;
+    const handleOpenChange = (next: boolean) => {
+        if (next) {
+            const target = value ?? today;
+            setView(startOfMonth(fromDayKey(target)));
+            setFocusKey(target);
         }
-        const target = value ?? today;
-        setView(startOfMonth(fromDayKey(target)));
-        setFocusKey(target);
-        // only when the popover opens
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [open]);
+        setOpen(next);
+    };
 
     useEffect(() => {
         if (open) {
@@ -69,7 +67,7 @@ export default function DatePicker({ value, onChange, label, placeholder = 'Pick
 
     return (
         <div className={cn('flex items-center gap-1', className)}>
-            <Popover open={open} onOpenChange={setOpen}>
+            <Popover open={open} onOpenChange={handleOpenChange}>
                 <PopoverTrigger asChild>
                     <Button type="button" variant="outline" size="sm" aria-label={`${label}: ${value ? formatDay(value) : 'not set'}`} className={cn('justify-start font-normal', !value && 'text-ink-3')}>
                         <CalendarDays strokeWidth={1.75} className="ico-calendar" />
