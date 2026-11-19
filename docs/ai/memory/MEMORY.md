@@ -1,0 +1,7 @@
+- [No Co-Authored-By trailer](feedback_no-coauthored-by-trailer.md) — never add Claude attribution to commits/PRs
+- [Kudos capstone](project_kudos-capstone.md) — what the repo is, stack, layout, status, decisions
+- [Latest stable versions](feedback_latest-stable-versions.md) — always newest stable of every stack part; upgrade together
+- [Coding standards](feedback_coding-standards.md) — DTOs, enums, strict types, PSR-12, early return, DRY, SOLID
+- [Logging, resilience, i18n](feedback_observability-resilience-i18n.md) — JSON 5W logs, no-500 errors, retry backoff, lang JSON
+- [Design preferences](feedback_design-preferences.md) — light/dark, frosted glass, chips, animated icons, no slop
+- [Sibling projects](reference_sibling-projects.md) — template locations for docker, logging, outage page, design

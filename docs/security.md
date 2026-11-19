@@ -51,7 +51,7 @@ Latest run (2026-11-19, after the fixes below): composer 0 advisories, npm 0 vul
 
 ## Knowingly accepted
 - `style-src 'unsafe-inline'`: React sets inline style attributes (charts, positioning). Scripts stay nonce-only.
-- Google fonts are loaded from `fonts.bunny.net` (privacy-friendly mirror); self-hosting the font files would remove the third-party origin.
+- Fonts (Instrument Sans, Fraunces) are self-hosted and bundled by Vite: no third-party font origin, nothing extra in the CSP.
 - Traffic between the app and Postgres on the internal `data` network is not encrypted; the network has no external route.
 - TLS is terminated in front of the stack (load balancer or proxy); HSTS is sent when the request arrives over HTTPS. Set `TRUSTED_PROXIES` so the app sees the real scheme and client IP.
 - No WAF or bot protection; the edge rate limits login, registration, client logs and public submissions.

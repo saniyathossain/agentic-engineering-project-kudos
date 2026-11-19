@@ -1,7 +1,7 @@
 # Kudos — minimal Testimonial.to clone
 
 Capstone for the Agentic Engineering course (Module 13), built with Claude Code.
-Laravel 12 + Inertia React (TypeScript) + Postgres + Stripe (Cashier, test mode), all in Docker.
+Laravel 13 + Inertia 3 React (TypeScript) + Postgres 18 + Stripe (Cashier, test mode), all in Docker. Latest stable of every part of the stack (PHP 8.5, Node 26, Vite 8, nginx 1.31); two packages are held back on purpose, see [CLAUDE.md](CLAUDE.md#versions).
 
 Requirements: [docs/prd.md](docs/prd.md) · Data model: [docs/data-model.md](docs/data-model.md) · Screenshots: [docs/screenshots/](docs/screenshots/)
 
@@ -65,6 +65,30 @@ Without keys the billing page explains that Stripe is not configured and the Upg
 
 Known gaps: only Postgres is exercised in dev (tests use sqlite); no SSR/CSP tuning; browser checks were manual — there is no automated end-to-end suite.
 
+## Observability and resilience
+
+- **Logs**: JSON on stderr, one object per line, grouped `who` / `what` / `where` / `when` / `why` (the Shell Console shape) plus `request_id`, `trace_id` and `client` (device type, OS, browser, timezone, screen, connection, language). Browser errors are shipped to the same stream via `POST /client-logs`. Configure with `LOG_*` in `docker/.envs/app.env`; secrets, bodies and query values are never logged.
+- **Request id**: accepted from the edge or caller when valid, otherwise generated; echoed in the `X-Request-ID` header and shown on every error page.
+- **No bare 500**: failures render a friendly page (or structured JSON) with the request id. A database or Stripe outage is a 503 with `Retry-After`. In prod the nginx edge serves a static outage page (503) when the app does not answer; it polls `/readyz` with exponential backoff and reloads when the app is back (`OUTAGE_FIRST_MS`, `OUTAGE_LONGEST_MS`). The browser shows a connection banner with the same backoff when a request cannot reach the server.
+- **Retry with exponential backoff and jitter** around outbound calls (Stripe): `RETRY_ATTEMPTS`, `RETRY_BASE_DELAY_MS`, `RETRY_MAX_DELAY_MS`, `RETRY_FACTOR`, `RETRY_JITTER=full|equal|none`, `RETRY_BUDGET_MS`.
+- **Probes**: `/livez` (process) and `/readyz` (database critical; cache and storage advisory), outside the session stack.
+- Known limit: an unexpected bug is still a 500 (a friendly page that is logged at error level); validation and mail wording come from Laravel's own language files.
+
+## Documentation
+
+| Topic | Where |
+|---|---|
+| Security controls, audit results, accepted risks | [docs/security.md](docs/security.md) · `make audit` |
+| Performance (Lighthouse, the engine behind Google PageSpeed) and responsive checks | [docs/performance/](docs/performance/) · `scripts/lighthouse-all.sh` |
+| HTTP API: OpenAPI 3.1, Postman, Insomnia and Bruno collections, every success and error case | [docs/api/](docs/api/) |
+| Every environment variable | [docs/configuration.md](docs/configuration.md) |
+| Requirements, data model, design | [docs/prd.md](docs/prd.md), [docs/data-model.md](docs/data-model.md), [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md) |
+| AI workflow: plans, memory, research, skills, hooks | [docs/ai/](docs/ai/README.md) |
+
+## Translations
+
+All user-facing text is in `codes/lang/en.json` (flat dotted keys, `:placeholder` syntax), read by Laravel with `__()` and by React with `t()` (keys are type-checked). English only for now; add `lang/<locale>.json` to add a language.
+
 ## Design
 
 Direction documented in [PRODUCT.md](PRODUCT.md) and [DESIGN.md](DESIGN.md), drawn from the Shell Console glass language and the Python Learning design rules.
@@ -96,14 +120,8 @@ early returns, one component per file on the frontend. Details in [CLAUDE.md](CL
 
 ## Reflection (draft — edit before submitting)
 
-_What worked:_ planning from the videos first, then a strict foundation (enums, DTOs, policies, migrations) before features, made the work parallelisable:
-the embed/dashboard agent only needed the contract (models, routes files, types) and its branch merged with two trivial conflicts. Static analysis at level 8 plus
-tests caught real mistakes early (nullable relations, untyped resources).
+_What worked:_ planning from the course videos first, then a strict foundation (enums, DTOs, policies, migrations) before features, made work parallelisable. An agent built the embed wall and dashboard in a git worktree and merged with two trivial conflicts; later three agents moved ~300 UI strings into `lang/en.json` in parallel because each owned a disjoint set of files and a lock-safe merge helper. Static analysis at level 8, tests and an independent `critic` review caught real mistakes (nullable relations, an unhandled DB outage).
 
-_Where it went wrong:_ the Docker dev stack cost the most time. Passing `env_file` into the containers made PHPUnit's `<env>` values lose, so the first test run hit the dev
-Postgres; `artisan serve` ignores container env, so config had to be merged into `.env`; three containers raced to rewrite that `.env` (fixed with `flock`); the prod image
-shipped dev-generated bootstrap caches until a `.dockerignore` was added. A one-line Python edit also truncated a file by opening it for write before reading. Parallel work duplicated a clipboard hook and a star-rating
-component, which I deduplicated after the merge.
+_Where it went wrong:_ the Docker dev stack cost the most time: container env beat PHPUnit's env (tests hit the dev database), `artisan serve` ignores container env, and three containers raced to rewrite one `.env` (flock does not work across containers on a bind mount; only one container may write it now). Upgrading to Laravel 13 / Inertia 3 left a stale compiled Blade view that rendered a blank page, which tests could not see because they never run the browser bundle; I only found it by opening the app. I also assumed Laravel 12 was current until corrected, and a one-line Python edit once truncated a file by opening it for write before reading it.
 
-_Next time:_ write the Docker/test-isolation rules into CLAUDE.md before the first run, give parallel agents a shared component inventory to avoid duplicates, run the `critic` subagent
-and a Playwright E2E suite per unit instead of manual checks, and get Stripe test keys up front so billing is verified end to end.
+_Next time:_ look up versions before scaffolding, write the Docker and test-isolation rules into CLAUDE.md before the first run, open the app in a browser after every framework upgrade, give parallel agents a component inventory to avoid duplicates, and get Stripe test keys up front so billing is verified end to end.
