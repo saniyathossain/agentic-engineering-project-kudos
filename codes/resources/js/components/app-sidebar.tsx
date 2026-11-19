@@ -1,15 +1,16 @@
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { t } from '@/lib/i18n';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { CreditCard, LayoutGrid, MessageSquareHeart } from 'lucide-react';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
-    { title: 'Dashboard', url: '/dashboard', icon: LayoutGrid },
-    { title: 'Spaces', url: '/spaces', icon: MessageSquareHeart },
-    { title: 'Billing', url: '/billing', icon: CreditCard },
+const buildMainNavItems = (): NavItem[] => [
+    { title: t('nav.main.dashboard'), url: '/dashboard', icon: LayoutGrid },
+    { title: t('nav.main.spaces'), url: '/spaces', icon: MessageSquareHeart },
+    { title: t('nav.main.billing'), url: '/billing', icon: CreditCard },
 ];
 
 export function AppSidebar() {
@@ -28,7 +29,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={buildMainNavItems()} />
             </SidebarContent>
 
             <SidebarFooter>

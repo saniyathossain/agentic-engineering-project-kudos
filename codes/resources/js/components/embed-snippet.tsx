@@ -1,11 +1,12 @@
 import CopyButton from '@/components/copy-button';
+import { t } from '@/lib/i18n';
 
 interface EmbedSnippetProps {
     publicId: string;
 }
 
 function buildEmbedSnippet(origin: string, publicId: string): string {
-    return `<iframe src="${origin}/embed/${publicId}" width="100%" height="600" frameborder="0" style="border:0" loading="lazy" title="Testimonials"></iframe>`;
+    return `<iframe src="${origin}/embed/${publicId}" width="100%" height="600" frameborder="0" style="border:0" loading="lazy" title="${t('embed.snippet.title')}"></iframe>`;
 }
 
 export default function EmbedSnippet({ publicId }: EmbedSnippetProps) {

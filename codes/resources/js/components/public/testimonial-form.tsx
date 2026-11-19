@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { t, type TranslationKey } from '@/lib/i18n';
 import { THEME_CLASSES } from '@/lib/space-theme';
 import { cn } from '@/lib/utils';
 import { type OptionalFieldKey, type Space } from '@/types';
@@ -27,10 +28,15 @@ type FormState = {
     consent: boolean;
 };
 
-const TEXT_FIELDS: ReadonlyArray<{ key: Exclude<OptionalFieldKey, 'photo'>; label: string; type: string; placeholder: string }> = [
-    { key: 'company', label: 'Company', type: 'text', placeholder: 'Where do you work?' },
-    { key: 'title', label: 'Job title', type: 'text', placeholder: 'Your role' },
-    { key: 'social_link', label: 'Social link', type: 'url', placeholder: 'https://' },
+const TEXT_FIELDS: ReadonlyArray<{
+    key: Exclude<OptionalFieldKey, 'photo'>;
+    label: TranslationKey;
+    type: string;
+    placeholder: TranslationKey;
+}> = [
+    { key: 'company', label: 'collect.form.company', type: 'text', placeholder: 'collect.form.company_placeholder' },
+    { key: 'title', label: 'collect.form.title', type: 'text', placeholder: 'collect.form.title_placeholder' },
+    { key: 'social_link', label: 'collect.form.social_link', type: 'url', placeholder: 'collect.form.social_link_placeholder' },
 ];
 
 export default function TestimonialForm({ space }: TestimonialFormProps) {
@@ -53,21 +59,21 @@ export default function TestimonialForm({ space }: TestimonialFormProps) {
     };
 
     return (
-        <form onSubmit={submit} className="mt-6 space-y-4" aria-label="Send a testimonial">
+        <form onSubmit={submit} className="mt-6 space-y-4" aria-label={t('collect.form.aria')}>
             {space.collect_rating && (
                 <div className="grid gap-1.5">
-                    <Label>Rating *</Label>
+                    <Label>{t('collect.form.rating')}</Label>
                     <StarRating value={data.rating} onChange={(value) => setData('rating', value)} className={theme.star} />
                     <InputError message={errors.rating} />
                 </div>
             )}
 
             <div className="grid gap-1.5">
-                <Label htmlFor="body">Your testimonial *</Label>
+                <Label htmlFor="body">{t('collect.form.body')}</Label>
                 <Textarea
                     id="body"
                     required
-                    placeholder="What was it like working with us?"
+                    placeholder={t('collect.form.body_placeholder')}
                     value={data.body}
                     onChange={(e) => setData('body', e.target.value)}
                     className={theme.input}
@@ -77,7 +83,7 @@ export default function TestimonialForm({ space }: TestimonialFormProps) {
 
             <div className="grid gap-4 sm:grid-cols-2">
                 <div className="grid gap-1.5">
-                    <Label htmlFor="name">Name *</Label>
+                    <Label htmlFor="name">{t('collect.form.name')}</Label>
                     <Input
                         id="name"
                         required
@@ -89,7 +95,7 @@ export default function TestimonialForm({ space }: TestimonialFormProps) {
                     <InputError message={errors.name} />
                 </div>
                 <div className="grid gap-1.5">
-                    <Label htmlFor="email">Email * (never shown publicly)</Label>
+                    <Label htmlFor="email">{t('collect.form.email')}</Label>
                     <Input
                         id="email"
                         type="email"
@@ -106,13 +112,13 @@ export default function TestimonialForm({ space }: TestimonialFormProps) {
             {TEXT_FIELDS.filter(({ key }) => space.fields[key].enabled).map(({ key, label, type, placeholder }) => (
                 <div key={key} className="grid gap-1.5">
                     <Label htmlFor={key}>
-                        {label}
+                        {t(label)}
                         {space.fields[key].required ? ' *' : ''}
                     </Label>
                     <Input
                         id={key}
                         type={type}
-                        placeholder={placeholder}
+                        placeholder={t(placeholder)}
                         required={space.fields[key].required}
                         value={data[key]}
                         onChange={(e) => setData(key, e.target.value)}
@@ -124,7 +130,10 @@ export default function TestimonialForm({ space }: TestimonialFormProps) {
 
             {space.fields.photo.enabled && (
                 <div className="grid gap-1.5">
-                    <Label htmlFor="photo">Your photo{space.fields.photo.required ? ' *' : ''}</Label>
+                    <Label htmlFor="photo">
+                        {t('collect.form.photo')}
+                        {space.fields.photo.required ? ' *' : ''}
+                    </Label>
                     <Input
                         id="photo"
                         type="file"
@@ -145,13 +154,13 @@ export default function TestimonialForm({ space }: TestimonialFormProps) {
                     onCheckedChange={(checked) => setData('consent', checked === true)}
                 />
                 <Label htmlFor="consent" className="text-sm leading-snug font-normal">
-                    I give permission to use this testimonial across social channels and other marketing efforts.
+                    {t('collect.form.consent')}
                 </Label>
             </div>
             <InputError message={errors.consent} />
 
             <Button type="submit" disabled={processing} size="lg" className={cn('w-full shadow-none', theme.button)}>
-                {processing ? 'Sending…' : 'Send testimonial'}
+                {processing ? t('collect.form.sending') : t('collect.form.submit')}
             </Button>
         </form>
     );

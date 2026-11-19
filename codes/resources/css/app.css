@@ -100,6 +100,11 @@
             radial-gradient(50rem 36rem at -10% 110%, var(--amb-cool), transparent 70%);
     }
 
+    /* links are told apart by colour and weight, never by an underline */
+    a {
+        text-decoration: none;
+    }
+
     h1,
     h2,
     h3 {

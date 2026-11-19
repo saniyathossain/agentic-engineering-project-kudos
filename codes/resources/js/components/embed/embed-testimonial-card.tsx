@@ -1,4 +1,5 @@
 import StarRating from '@/components/star-rating';
+import { t } from '@/lib/i18n';
 import { THEME_CLASSES } from '@/lib/space-theme';
 import { cn } from '@/lib/utils';
 import { type EmbedTestimonial, type SpaceTheme } from '@/types';
@@ -10,7 +11,10 @@ interface EmbedTestimonialCardProps {
 
 export default function EmbedTestimonialCard({ testimonial, theme }: EmbedTestimonialCardProps) {
     const classes = THEME_CLASSES[theme];
-    const byline = [testimonial.title, testimonial.company].filter(Boolean).join(' at ');
+    const byline =
+        testimonial.title && testimonial.company
+            ? t('embed.byline', { title: testimonial.title, company: testimonial.company })
+            : (testimonial.title ?? testimonial.company);
 
     return (
         <figure className={cn('flex flex-col gap-4 rounded-2xl border p-5', classes.surface)}>

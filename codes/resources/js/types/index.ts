@@ -71,6 +71,8 @@ export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    locale: string;
+    resilience: { first_ms: number; longest_ms: number };
     plan: PlanInfo | null;
     flash: { success: string | null; error: string | null };
     [key: string]: unknown;

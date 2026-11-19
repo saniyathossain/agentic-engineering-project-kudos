@@ -1,5 +1,6 @@
 import process from 'node:process';
 import react from '@vitejs/plugin-react';
+import { fileURLToPath } from 'node:url';
 import laravel from 'laravel-vite-plugin';
 import {
     defineConfig
@@ -21,7 +22,10 @@ export default defineConfig({
         origin: process.env.VITE_DEV_ORIGIN,
         cors: true,
     },
-    esbuild: {
-        jsx: 'automatic',
+    resolve: {
+        alias: {
+            // lang/*.json is the single source of translations for Laravel and the React app
+            '@lang': fileURLToPath(new URL('./lang', import.meta.url)),
+        },
     },
 });

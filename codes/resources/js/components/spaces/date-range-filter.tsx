@@ -1,6 +1,7 @@
 import { Chip } from '@/components/ui/chip';
 import DatePicker from '@/components/ui/date-picker';
 import { addDays, type DayKey, toDayKey } from '@/lib/dates';
+import { t, type TranslationKey } from '@/lib/i18n';
 import { router } from '@inertiajs/react';
 import { CalendarRange } from 'lucide-react';
 
@@ -11,9 +12,9 @@ interface DateRangeFilterProps {
     to: DayKey | null;
 }
 
-const PRESETS: ReadonlyArray<{ label: string; days: number }> = [
-    { label: 'Last 7 days', days: 7 },
-    { label: 'Last 30 days', days: 30 },
+const PRESETS: ReadonlyArray<{ label: TranslationKey; days: number }> = [
+    { label: 'inbox.range.last_7', days: 7 },
+    { label: 'inbox.range.last_30', days: 30 },
 ];
 
 export default function DateRangeFilter({ spaceId, filter, from, to }: DateRangeFilterProps) {
@@ -31,18 +32,30 @@ export default function DateRangeFilter({ spaceId, filter, from, to }: DateRange
     const today = new Date();
 
     return (
-        <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Date range">
+        <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t('inbox.range.label')}>
             <CalendarRange className="text-ink-3 size-4" strokeWidth={1.75} aria-hidden="true" />
-            <DatePicker label="From" placeholder="From" value={from} max={to ?? undefined} onChange={(value) => apply({ from: value, to })} />
+            <DatePicker
+                label={t('inbox.range.from')}
+                placeholder={t('inbox.range.from')}
+                value={from}
+                max={to ?? undefined}
+                onChange={(value) => apply({ from: value, to })}
+            />
             <span className="text-ink-3 text-sm" aria-hidden="true">
-                to
+                {t('inbox.range.to_separator')}
             </span>
-            <DatePicker label="To" placeholder="To" value={to} min={from ?? undefined} onChange={(value) => apply({ from, to: value })} />
+            <DatePicker
+                label={t('inbox.range.to')}
+                placeholder={t('inbox.range.to')}
+                value={to}
+                min={from ?? undefined}
+                onChange={(value) => apply({ from, to: value })}
+            />
             <div className="flex flex-wrap gap-1.5">
                 {PRESETS.map(({ label, days }) => (
                     <Chip key={label} asChild tone="outline">
                         <button type="button" onClick={() => apply({ from: toDayKey(addDays(today, -days)), to: toDayKey(today) })}>
-                            {label}
+                            {t(label)}
                         </button>
                     </Chip>
                 ))}

@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Chip } from '@/components/ui/chip';
 import { Textarea } from '@/components/ui/textarea';
 import { formatTimestamp } from '@/lib/dates';
+import { t, tDynamic, type TranslationKey } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { type Testimonial, type TestimonialStatus } from '@/types';
 import { router } from '@inertiajs/react';
@@ -16,10 +17,10 @@ interface TestimonialCardProps {
 
 const STATUS_TONE = { published: 'success', pending: 'warning', hidden: 'neutral' } as const;
 
-const STATUS_ACTIONS: ReadonlyArray<{ status: TestimonialStatus; label: string; icon: LucideIcon; anim: string }> = [
-    { status: 'published', label: 'Publish', icon: Send, anim: 'ico-send' },
-    { status: 'hidden', label: 'Hide', icon: EyeOff, anim: 'ico-eye' },
-    { status: 'pending', label: 'Mark pending', icon: Eye, anim: 'ico-eye' },
+const STATUS_ACTIONS: ReadonlyArray<{ status: TestimonialStatus; label: TranslationKey; icon: LucideIcon; anim: string }> = [
+    { status: 'published', label: 'inbox.action.publish', icon: Send, anim: 'ico-send' },
+    { status: 'hidden', label: 'inbox.action.hide', icon: EyeOff, anim: 'ico-eye' },
+    { status: 'pending', label: 'inbox.action.mark_pending', icon: Eye, anim: 'ico-eye' },
 ];
 
 export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
@@ -29,7 +30,7 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
 
     const saveBody = () => router.patch(base('testimonials.update'), { body }, { preserveScroll: true, onSuccess: () => setEditing(false) });
     const remove = () => {
-        if (window.confirm('Delete this testimonial permanently?')) {
+        if (window.confirm(t('inbox.action.delete_confirm'))) {
             router.delete(base('testimonials.destroy'), { preserveScroll: true });
         }
     };
@@ -47,7 +48,7 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
                         </p>
                     </div>
                     <Chip tone={STATUS_TONE[testimonial.status]} dot>
-                        {testimonial.status}
+                        {tDynamic(`inbox.status.${testimonial.status}`)}
                     </Chip>
                 </div>
 
@@ -60,13 +61,13 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
 
                 {editing ? (
                     <div className="space-y-2">
-                        <Textarea value={body} onChange={(e) => setBody(e.target.value)} aria-label="Edit testimonial text" />
+                        <Textarea value={body} onChange={(e) => setBody(e.target.value)} aria-label={t('inbox.edit_aria')} />
                         <div className="flex gap-2">
                             <Button size="sm" onClick={saveBody}>
-                                Save
+                                {t('common.save')}
                             </Button>
                             <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>
-                                Cancel
+                                {t('common.cancel')}
                             </Button>
                         </div>
                     </div>
@@ -82,7 +83,7 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
                             variant="outline"
                             onClick={() => router.patch(base('testimonials.status'), { status }, { preserveScroll: true })}
                         >
-                            <Icon strokeWidth={1.75} className={anim} /> {label}
+                            <Icon strokeWidth={1.75} className={anim} /> {t(label)}
                         </Button>
                     ))}
                     <Button
@@ -92,12 +93,12 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
                         onClick={() => router.patch(base('testimonials.favorite'), {}, { preserveScroll: true })}
                     >
                         <Heart strokeWidth={1.75} className={cn('ico-heart', testimonial.is_favorite && 'text-destructive fill-current')} />
-                        {testimonial.is_favorite ? 'Favorited' : 'Favorite'}
+                        {testimonial.is_favorite ? t('inbox.action.favorited') : t('inbox.action.favorite')}
                     </Button>
                     <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
-                        <Pencil strokeWidth={1.75} className="ico-pencil" /> Edit
+                        <Pencil strokeWidth={1.75} className="ico-pencil" /> {t('common.edit')}
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={remove} aria-label="Delete testimonial">
+                    <Button size="sm" variant="ghost" onClick={remove} aria-label={t('inbox.action.delete_aria')}>
                         <Trash2 strokeWidth={1.75} className="ico-trash" />
                     </Button>
                 </div>

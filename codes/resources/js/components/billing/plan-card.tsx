@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
 import { type CSSProperties, type ReactNode } from 'react';
@@ -21,7 +22,7 @@ export default function PlanCard({ name, price, tagline, features, current, high
             <div className="space-y-1">
                 <div className="flex items-center justify-between gap-2">
                     <h2 className="font-display text-2xl font-medium">{name}</h2>
-                    {current && <Badge>Current plan</Badge>}
+                    {current && <Badge>{t('billing.current_plan')}</Badge>}
                 </div>
                 <p className="text-muted-foreground text-sm">{tagline}</p>
                 <p className="font-display pt-2 text-4xl leading-none font-medium">{price}</p>

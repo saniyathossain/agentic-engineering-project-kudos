@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { addDays, addMonths, type DayKey, formatDay, fromDayKey, monthGrid, startOfMonth, toDayKey } from '@/lib/dates';
@@ -19,7 +20,7 @@ const WEEKDAYS = Array.from({ length: 7 }, (_, index) => new Intl.DateTimeFormat
 const MONTH_FORMAT = new Intl.DateTimeFormat(undefined, { month: 'long', year: 'numeric' });
 
 /** A light date picker: a popover month grid with keyboard navigation. No dependencies, nothing rendered until opened. */
-export default function DatePicker({ value, onChange, label, placeholder = 'Pick a date', min, max, className }: DatePickerProps) {
+export default function DatePicker({ value, onChange, label, placeholder, min, max, className }: DatePickerProps) {
     const [open, setOpen] = useState(false);
     const [view, setView] = useState<Date>(() => startOfMonth(value ? fromDayKey(value) : new Date()));
     const [focusKey, setFocusKey] = useState<DayKey>(value ?? toDayKey(new Date()));
@@ -69,20 +70,20 @@ export default function DatePicker({ value, onChange, label, placeholder = 'Pick
         <div className={cn('flex items-center gap-1', className)}>
             <Popover open={open} onOpenChange={handleOpenChange}>
                 <PopoverTrigger asChild>
-                    <Button type="button" variant="outline" size="sm" aria-label={`${label}: ${value ? formatDay(value) : 'not set'}`} className={cn('justify-start font-normal', !value && 'text-ink-3')}>
+                    <Button type="button" variant="outline" size="sm" aria-label={t('ui.date_picker.value', { label, value: value ? formatDay(value) : t('ui.date_picker.not_set') })} className={cn('justify-start font-normal', !value && 'text-ink-3')}>
                         <CalendarDays strokeWidth={1.75} className="ico-calendar" />
-                        {value ? formatDay(value) : placeholder}
+                        {value ? formatDay(value) : (placeholder ?? t('ui.date_picker.placeholder'))}
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent aria-label={label} className="w-72">
                     <div className="mb-2 flex items-center justify-between">
-                        <Button type="button" variant="ghost" size="icon" className="size-8" aria-label="Previous month" onClick={() => setView(addMonths(view, -1))}>
+                        <Button type="button" variant="ghost" size="icon" className="size-8" aria-label={t('ui.date_picker.previous_month')} onClick={() => setView(addMonths(view, -1))}>
                             <ChevronLeft strokeWidth={1.75} className="ico-left" />
                         </Button>
                         <p className="font-display text-base font-medium" aria-live="polite">
                             {MONTH_FORMAT.format(view)}
                         </p>
-                        <Button type="button" variant="ghost" size="icon" className="size-8" aria-label="Next month" onClick={() => setView(addMonths(view, 1))}>
+                        <Button type="button" variant="ghost" size="icon" className="size-8" aria-label={t('ui.date_picker.next_month')} onClick={() => setView(addMonths(view, 1))}>
                             <ChevronRight strokeWidth={1.75} className="ico-right" />
                         </Button>
                     </div>
@@ -124,16 +125,16 @@ export default function DatePicker({ value, onChange, label, placeholder = 'Pick
                     </div>
                     <div className="mt-2 flex justify-between border-t pt-2">
                         <Button type="button" variant="ghost" size="sm" onClick={() => select(today)} disabled={isDisabled(today)}>
-                            Today
+                            {t('common.today')}
                         </Button>
                         <Button type="button" variant="ghost" size="sm" onClick={() => { onChange(null); setOpen(false); }} disabled={value === null}>
-                            Clear
+                            {t('common.clear')}
                         </Button>
                     </div>
                 </PopoverContent>
             </Popover>
             {value && (
-                <Button type="button" variant="ghost" size="icon" className="size-8" aria-label={`Clear ${label}`} onClick={() => onChange(null)}>
+                <Button type="button" variant="ghost" size="icon" className="size-8" aria-label={t('ui.date_picker.clear_label', { label })} onClick={() => onChange(null)}>
                     <X strokeWidth={1.75} />
                 </Button>
             )}

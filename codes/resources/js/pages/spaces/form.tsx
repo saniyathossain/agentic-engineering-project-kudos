@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { t, type TranslationKey } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem, type FieldConfig, type FieldsConfig, type OptionalFieldKey, type Space, type SpaceTheme } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -36,11 +37,11 @@ type SpaceFormState = {
     logo: File | null;
 };
 
-const FIELD_LABELS: Record<OptionalFieldKey, string> = {
-    company: 'Company name',
-    title: 'Job title',
-    social_link: 'Social link',
-    photo: 'Profile photo',
+const FIELD_LABELS: Record<OptionalFieldKey, TranslationKey> = {
+    company: 'spaces.form.field.company',
+    title: 'spaces.form.field.title',
+    social_link: 'spaces.form.field.social_link',
+    photo: 'spaces.form.field.photo',
 };
 
 const THEME_SWATCH: Record<SpaceTheme, string> = {
@@ -70,8 +71,8 @@ export default function SpaceForm({ space, themes, optionalFields }: FormProps) 
     const isEditing = space !== null;
     const { data, setData, post, errors, processing, transform } = useForm<SpaceFormState>(initialState(space, optionalFields));
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Spaces', href: '/spaces' },
-        { title: isEditing ? 'Edit' : 'New', href: '#' },
+        { title: t('spaces.index.title'), href: '/spaces' },
+        { title: isEditing ? t('spaces.form.breadcrumb_edit') : t('spaces.form.breadcrumb_new'), href: '#' },
     ];
 
     const logoPreview = useMemo(() => (data.logo ? URL.createObjectURL(data.logo) : (space?.logo_url ?? null)), [data.logo, space?.logo_url]);
@@ -88,46 +89,46 @@ export default function SpaceForm({ space, themes, optionalFields }: FormProps) 
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={isEditing ? 'Edit space' : 'New space'} />
+            <Head title={isEditing ? t('spaces.form.title_edit') : t('spaces.form.title_new')} />
             <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 sm:p-6">
-                <PageHeader title={isEditing ? 'Edit space' : 'New space'} description="Changes show in the preview as you type." />
+                <PageHeader title={isEditing ? t('spaces.form.title_edit') : t('spaces.form.title_new')} description={t('spaces.form.description')} />
                 <div className="grid items-start gap-6 lg:grid-cols-2">
-                    <form onSubmit={submit} className="pane rise space-y-5 rounded-2xl p-5 sm:p-6" aria-label="Space settings">
+                    <form onSubmit={submit} className="pane rise space-y-5 rounded-2xl p-5 sm:p-6" aria-label={t('spaces.form.aria')}>
                         <div className="grid gap-1.5">
-                            <Label htmlFor="name">Space name *</Label>
+                            <Label htmlFor="name">{t('spaces.form.name')}</Label>
                             <Input
                                 id="name"
                                 required
-                                placeholder="e.g. Agentic Engineering Course"
+                                placeholder={t('spaces.form.name_placeholder')}
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
                             />
                             <InputError message={errors.name} />
                         </div>
                         <div className="grid gap-1.5">
-                            <Label htmlFor="header_title">Header title *</Label>
+                            <Label htmlFor="header_title">{t('spaces.form.header_title')}</Label>
                             <Input
                                 id="header_title"
                                 required
-                                placeholder="e.g. Would you recommend the course?"
+                                placeholder={t('spaces.form.header_title_placeholder')}
                                 value={data.header_title}
                                 onChange={(e) => setData('header_title', e.target.value)}
                             />
                             <InputError message={errors.header_title} />
                         </div>
                         <div className="grid gap-1.5">
-                            <Label htmlFor="message">Custom message * (Markdown supported)</Label>
+                            <Label htmlFor="message">{t('spaces.form.message')}</Label>
                             <Textarea
                                 id="message"
                                 required
-                                placeholder="Write a warm note: what should people tell you about?"
+                                placeholder={t('spaces.form.message_placeholder')}
                                 value={data.message}
                                 onChange={(e) => setData('message', e.target.value)}
                             />
                             <InputError message={errors.message} />
                         </div>
                         <div className="grid gap-1.5">
-                            <Label htmlFor="logo">Logo</Label>
+                            <Label htmlFor="logo">{t('spaces.form.logo')}</Label>
                             <Input
                                 id="logo"
                                 type="file"
@@ -138,13 +139,13 @@ export default function SpaceForm({ space, themes, optionalFields }: FormProps) 
                         </div>
 
                         <fieldset className="space-y-2">
-                            <legend className="text-sm font-medium">Respondent fields</legend>
-                            <p className="text-muted-foreground text-sm">Name and email are always required.</p>
+                            <legend className="text-sm font-medium">{t('spaces.form.fields_legend')}</legend>
+                            <p className="text-muted-foreground text-sm">{t('spaces.form.fields_note')}</p>
                             {optionalFields.map((key) => (
                                 <OptionalFieldRow
                                     key={key}
                                     id={key}
-                                    label={FIELD_LABELS[key]}
+                                    label={t(FIELD_LABELS[key])}
                                     config={data.fields[key]}
                                     onChange={(config) => setData('fields', { ...data.fields, [key]: config })}
                                 />
@@ -152,8 +153,8 @@ export default function SpaceForm({ space, themes, optionalFields }: FormProps) 
                         </fieldset>
 
                         <div className="grid gap-1.5">
-                            <Label>Theme</Label>
-                            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Theme">
+                            <Label>{t('spaces.form.theme')}</Label>
+                            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={t('spaces.form.theme')}>
                                 {themes.map((theme) => (
                                     <Chip
                                         key={theme.value}
@@ -186,7 +187,7 @@ export default function SpaceForm({ space, themes, optionalFields }: FormProps) 
                                 checked={data.collect_rating}
                                 onCheckedChange={(checked) => setData('collect_rating', checked === true)}
                             />
-                            <Label htmlFor="collect_rating">Collect star ratings</Label>
+                            <Label htmlFor="collect_rating">{t('spaces.form.collect_rating')}</Label>
                         </div>
                         <div className="flex items-center gap-2">
                             <Checkbox
@@ -194,21 +195,21 @@ export default function SpaceForm({ space, themes, optionalFields }: FormProps) 
                                 checked={data.is_accepting}
                                 onCheckedChange={(checked) => setData('is_accepting', checked === true)}
                             />
-                            <Label htmlFor="is_accepting">Accepting new testimonials</Label>
+                            <Label htmlFor="is_accepting">{t('spaces.form.is_accepting')}</Label>
                         </div>
 
                         <div className="flex gap-2">
                             <Button type="submit" disabled={processing}>
-                                {isEditing ? 'Save changes' : 'Create space'}
+                                {isEditing ? t('spaces.form.save') : t('spaces.form.create')}
                             </Button>
                             <Button asChild variant="ghost">
-                                <Link href={route('spaces.index')}>Cancel</Link>
+                                <Link href={route('spaces.index')}>{t('common.cancel')}</Link>
                             </Button>
                         </div>
                     </form>
 
-                    <aside aria-label="Live preview" className="flex flex-col items-center gap-3 lg:sticky lg:top-20">
-                        <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">Live preview</p>
+                    <aside aria-label={t('spaces.form.preview')} className="flex flex-col items-center gap-3 lg:sticky lg:top-20">
+                        <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{t('spaces.form.preview')}</p>
                         <CollectionCard space={{ ...data, logo_url: logoPreview }} />
                     </aside>
                 </div>

@@ -1,5 +1,6 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { t } from '@/lib/i18n';
 import { type FieldConfig } from '@/types';
 
 interface OptionalFieldRowProps {
@@ -28,7 +29,7 @@ export default function OptionalFieldRow({ id, label, config, onChange }: Option
                     onCheckedChange={(checked) => onChange({ ...config, required: checked === true })}
                 />
                 <Label htmlFor={`${id}-required`} className="text-muted-foreground text-sm font-normal">
-                    Required
+                    {t('spaces.form.required')}
                 </Label>
             </div>
         </div>

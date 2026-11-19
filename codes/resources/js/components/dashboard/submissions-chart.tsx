@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 import { type DailyCount } from '@/types';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
@@ -18,7 +19,7 @@ const TOOLTIP_STYLE = {
 
 export default function SubmissionsChart({ series }: SubmissionsChartProps) {
     return (
-        <div className="h-64 w-full" role="img" aria-label="Testimonials collected per day">
+        <div className="h-64 w-full" role="img" aria-label={t('dashboard.chart.label')}>
             <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={series} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="2 6" vertical={false} stroke="var(--border)" />
@@ -33,7 +34,14 @@ export default function SubmissionsChart({ series }: SubmissionsChartProps) {
                     />
                     <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} tick={{ fill: 'var(--muted-foreground)' }} />
                     <Tooltip cursor={{ fill: 'var(--accent)' }} contentStyle={TOOLTIP_STYLE} />
-                    <Bar dataKey="count" name="Testimonials" fill="var(--chart-1)" radius={[6, 6, 2, 2]} maxBarSize={28} animationDuration={600} />
+                    <Bar
+                        dataKey="count"
+                        name={t('dashboard.chart.series')}
+                        fill="var(--chart-1)"
+                        radius={[6, 6, 2, 2]}
+                        maxBarSize={28}
+                        animationDuration={600}
+                    />
                 </BarChart>
             </ResponsiveContainer>
         </div>

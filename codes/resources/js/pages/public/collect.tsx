@@ -1,6 +1,7 @@
 import FlashMessage from '@/components/flash-message';
 import TestimonialForm from '@/components/public/testimonial-form';
 import CollectionCard from '@/components/spaces/collection-card';
+import { t } from '@/lib/i18n';
 import { THEME_CLASSES } from '@/lib/space-theme';
 import { cn } from '@/lib/utils';
 import { type SharedData, type Space } from '@/types';
@@ -26,13 +27,13 @@ export default function Collect({ space, accepting }: CollectProps) {
                     {thanks && (
                         <div className="animate-pop mt-8 flex items-start gap-3" role="status">
                             <CircleCheck className={cn('mt-0.5 size-6 shrink-0', theme.star)} strokeWidth={1.75} />
-                            <p className="font-display text-xl leading-snug">Thank you. Your words are on their way to the team.</p>
+                            <p className="font-display text-xl leading-snug">{t('collect.thanks')}</p>
                         </div>
                     )}
                     {!thanks && accepting && <TestimonialForm space={space} />}
-                    {!thanks && !accepting && <p className={`mt-6 ${theme.muted}`}>This page is not accepting testimonials right now.</p>}
+                    {!thanks && !accepting && <p className={`mt-6 ${theme.muted}`}>{t('collect.closed')}</p>}
                 </CollectionCard>
-                <p className={cn('mt-auto pt-8 text-xs', theme.muted)}>Collected with Kudos</p>
+                <p className={cn('mt-auto pt-8 text-xs', theme.muted)}>{t('collect.footer')}</p>
             </main>
         </>
     );

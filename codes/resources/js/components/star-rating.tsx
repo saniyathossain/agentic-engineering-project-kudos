@@ -1,3 +1,4 @@
+import { t, tc } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { Star } from 'lucide-react';
 
@@ -16,7 +17,7 @@ export default function StarRating({ value, onChange, className }: StarRatingPro
         <div
             className={cn('text-star flex gap-0.5', className)}
             role={onChange ? 'radiogroup' : 'img'}
-            aria-label={`Rating: ${value ?? 0} of ${MAX_STARS}`}
+            aria-label={t('rating.label', { value: value ?? 0, max: MAX_STARS })}
         >
             {stars.map((star) => {
                 const filled = star <= (value ?? 0);
@@ -34,7 +35,7 @@ export default function StarRating({ value, onChange, className }: StarRatingPro
                         type="button"
                         role="radio"
                         aria-checked={star === value}
-                        aria-label={`${star} stars`}
+                        aria-label={tc('rating.stars', star)}
                         onClick={() => onChange(star)}
                         className="rounded-md"
                     >
