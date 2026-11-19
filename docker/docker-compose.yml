@@ -9,6 +9,7 @@ x-app: &app
     - ../codes:/app
     - /app/vendor
     - /app/node_modules
+    - ./.envs/app.env.example:/run/app.defaults.env:ro
     - ./.envs/app.env:/run/app.env:ro
   depends_on:
     db:

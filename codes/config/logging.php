@@ -2,9 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Logging\FiveWFormatter;
+use App\Logging\RequestContextProcessor;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
+use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Processor\PsrLogMessageProcessor;
 
 return [
@@ -20,7 +24,7 @@ return [
     |
     */
 
-    'default' => env('LOG_CHANNEL', 'stack'),
+    'default' => env('LOG_CHANNEL', 'stderr_json'),
 
     /*
     |--------------------------------------------------------------------------
@@ -94,6 +98,25 @@ return [
                 'connectionString' => 'tls://'.env('PAPERTRAIL_URL').':'.env('PAPERTRAIL_PORT'),
             ],
             'processors' => [PsrLogMessageProcessor::class],
+        ],
+
+        // JSON 5W lines on stderr (who, what, where, when, why + request_id + client device). LOG_FORMAT=text for a plain line.
+        'stderr_json' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_LEVEL', 'info'),
+            'handler' => StreamHandler::class,
+            'formatter' => env('LOG_FORMAT', 'json') === 'text' ? LineFormatter::class : FiveWFormatter::class,
+            'with' => [
+                'stream' => 'php://stderr',
+            ],
+            'processors' => [
+                PsrLogMessageProcessor::class,
+                RequestContextProcessor::class,
+                [
+                    'processor' => IntrospectionProcessor::class,
+                    'with' => ['level' => 'warning', 'skipClassesPartials' => ['Illuminate\\', 'Monolog\\', 'App\\Logging\\']],
+                ],
+            ],
         ],
 
         'stderr' => [

@@ -19,7 +19,9 @@ setup_env() {
   local current=".env"
   [ -f "$current" ] || current=".env.example"
   cp "$current" .env.new
-  if [ -f /run/app.env ]; then
+  # defaults first (app.env.example), then the user's app.env on top
+  for envfile in /run/app.defaults.env /run/app.env; do
+    [ -f "$envfile" ] || continue
     while IFS= read -r line; do
       case "$line" in ''|\#*) continue ;; esac
       key="${line%%=*}"; val="${line#*=}"
@@ -28,8 +30,8 @@ setup_env() {
       else
         printf '%s=%s\n' "$key" "$val" >> .env.new
       fi
-    done < /run/app.env
-  fi
+    done < "$envfile"
+  done
   if ! grep -q '^APP_KEY=.\+' .env.new; then
     key="base64:$(php -r 'echo base64_encode(random_bytes(32));')"
     if grep -q '^APP_KEY=' .env.new; then
