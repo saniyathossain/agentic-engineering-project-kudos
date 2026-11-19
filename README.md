@@ -77,7 +77,7 @@ early returns, one component per file on the frontend. Details in [CLAUDE.md](CL
 |---|---|
 | **AI-DLC** (awslabs, v2.11.4) | Installed and configured for Claude Code (`.claude/`, `aidlc/`). `/aidlc` was started but the build itself ran as plan → implement → verify directly; `docs/prd.md`, `docs/data-model.md` stand in for inception artifacts. |
 | **Plan mode + video analysis** | Course videos were turned into a requirements summary and plan before any code. |
-| **Subagents** | A `general-purpose` agent built the embed wall + dashboard in an isolated git worktree while the main session built spaces/public/inbox/billing; an `Explore` agents summarised the videos. A `critic` reviewer agent is defined in `.claude/agents/critic.md` (not yet run on this code). |
+| **Subagents** | A `general-purpose` agent built the embed wall + dashboard in an isolated git worktree while the main session built spaces/public/inbox/billing; `Explore` agents summarised the videos. A `critic` reviewer agent is defined in `.claude/agents/critic.md` (not yet run on this code). |
 | **Parallel work + merge** | Branch `worktree-agent-…` (embed + dashboard) merged with `--no-ff` into `main`; conflicts in `package.json`/lockfile resolved by hand. See `git log --graph`. |
 | **Skill** | `.claude/skills/verify-feature/SKILL.md` (tests → Pint → Larastan → on-plan diff → UI smoke → critic). |
 | **Hooks** | `scripts/hooks/protect-env.sh` (PreToolUse: blocks edits to env files) and `pint-on-edit.sh` (PostToolUse), wired in `.claude/settings.json`. |
