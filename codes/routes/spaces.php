@@ -6,7 +6,7 @@ use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\TestimonialController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth')->group(function (): void {
+Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::resource('spaces', SpaceController::class)->parameters(['spaces' => 'space']);
 
     Route::prefix('testimonials/{testimonial}')->name('testimonials.')->group(function (): void {

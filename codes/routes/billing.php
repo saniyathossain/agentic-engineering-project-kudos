@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\BillingController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth')->prefix('billing')->name('billing.')->group(function (): void {
+Route::middleware(['auth', 'verified'])->prefix('billing')->name('billing.')->group(function (): void {
     Route::get('/', [BillingController::class, 'show'])->name('show');
     Route::post('checkout', [BillingController::class, 'checkout'])->name('checkout');
     Route::get('success', [BillingController::class, 'success'])->name('success');

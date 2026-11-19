@@ -35,3 +35,4 @@ codes/node_modules/
 codes/.env
 .DS_Store
 docker/.envs/app.prod.env
+.claude/worktrees/

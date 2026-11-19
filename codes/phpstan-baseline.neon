@@ -43,12 +43,6 @@ parameters:
 			path: app/Http/Controllers/Settings/PasswordController.php
 
 		-
-			message: '#^Instanceof between App\\Models\\User\|null and Illuminate\\Contracts\\Auth\\MustVerifyEmail will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
-			count: 1
-			path: app/Http/Controllers/Settings/PasswordController.php
-
-		-
 			message: '#^Cannot access property \$email_verified_at on App\\Models\\User\|null\.$#'
 			identifier: property.nonObject
 			count: 1
@@ -75,12 +69,6 @@ parameters:
 		-
 			message: '#^Cannot call method save\(\) on App\\Models\\User\|null\.$#'
 			identifier: method.nonObject
-			count: 1
-			path: app/Http/Controllers/Settings/ProfileController.php
-
-		-
-			message: '#^Instanceof between App\\Models\\User\|null and Illuminate\\Contracts\\Auth\\MustVerifyEmail will always evaluate to false\.$#'
-			identifier: instanceof.alwaysFalse
 			count: 1
 			path: app/Http/Controllers/Settings/ProfileController.php
 
