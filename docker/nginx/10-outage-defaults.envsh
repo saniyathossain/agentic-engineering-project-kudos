@@ -1,0 +1,5 @@
+# Sourced by the nginx entrypoint before the template is rendered: the outage settings must be whole numbers,
+# because they are written into a JSON file that the outage page reads.
+case "${OUTAGE_FIRST_MS:-}" in ''|*[!0-9]*) OUTAGE_FIRST_MS=4000 ;; esac
+case "${OUTAGE_LONGEST_MS:-}" in ''|*[!0-9]*) OUTAGE_LONGEST_MS=15000 ;; esac
+export OUTAGE_FIRST_MS OUTAGE_LONGEST_MS

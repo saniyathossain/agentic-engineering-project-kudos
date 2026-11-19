@@ -1,0 +1,80 @@
+# Edge for the php-fpm app. Static files from the shared public dir; everything else to fpm.
+# Rendered with envsubst at container start (NGINX_ENVSUBST_FILTER limits it to ${OUTAGE_*}; nginx's own $vars are untouched).
+server_tokens off;
+limit_req_zone $binary_remote_addr zone=auth:10m rate=10r/m;
+limit_req_zone $binary_remote_addr zone=submit:10m rate=20r/m;
+limit_req_zone $binary_remote_addr zone=clientlog:10m rate=5r/s;
+
+# one id per request: a valid id from the caller wins, otherwise nginx's own; the app echoes it and logs it
+map $http_x_request_id $req_id {
+    default $request_id;
+    "~^[A-Za-z0-9._-]{8,64}$" $http_x_request_id;
+}
+
+server {
+    listen 8080;
+    root /var/www/public;
+    index index.php;
+    client_max_body_size 8m;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+
+    location = /healthz { access_log off; return 200 "ok\n"; }
+
+    # When the app does not answer, the edge answers instead: a 503 with Retry-After, never a bare 502/504.
+    error_page 502 503 504 =503 @unavailable;
+    location @unavailable {
+        internal;
+        add_header Retry-After 5 always;
+        add_header Cache-Control "no-store" always;
+        add_header X-Edge "nginx" always;
+        add_header X-Request-ID $req_id always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'" always;
+        if ($http_accept ~* "application/json") {
+            return 503 '{"error":"Temporarily unavailable. Try again shortly.","code":"unavailable","dependency":"app","source":"edge","request_id":"$req_id"}';
+        }
+        rewrite ^ /outage.html break;
+    }
+
+    # Polling intervals for the outage page, set from the environment.
+    location = /status/outage-config.json {
+        default_type application/json;
+        add_header Cache-Control "no-store" always;
+        return 200 '{"first_ms":${OUTAGE_FIRST_MS},"longest_ms":${OUTAGE_LONGEST_MS}}';
+    }
+
+    # Served by the edge itself, so the outage page has its styles, script and words with the app down.
+    location ^~ /status/ { expires 5m; try_files $uri =404; }
+    location = /outage.html { internal; }
+
+    location /build/ { expires 1y; add_header Cache-Control "public, immutable"; try_files $uri =404; }
+
+    # embed pages are meant to be framed anywhere
+    location ^~ /embed/ {
+        add_header X-Content-Type-Options "nosniff" always;
+        try_files $uri /index.php?$query_string;
+    }
+
+    location ~ ^/(login|register|forgot-password|reset-password)$ {
+        limit_req zone=auth burst=10 nodelay;
+        try_files $uri /index.php?$query_string;
+    }
+
+    location / { try_files $uri $uri/ /index.php?$query_string; }
+
+    # browser error reports: small bodies, rate limited before they reach php
+    location = /client-logs {
+        limit_req zone=clientlog burst=20 nodelay;
+        client_max_body_size 16k;
+        include snippets/fastcgi-app.conf;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-app.conf;
+    }
+
+    location ~ /\.(?!well-known) { deny all; }
+}

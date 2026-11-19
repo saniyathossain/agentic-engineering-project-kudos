@@ -2,11 +2,12 @@
 DC      = docker compose -f docker/docker-compose.yml
 DC_PROD = docker compose -f docker/docker-compose.yml -f docker/docker-compose.prod.yml
 
-.PHONY: dev prod down migrate test lint types logs
+.PHONY: dev prod down migrate test lint types logs audit
 dev:
 	$(DC) up -d --build
 prod:
 	@test -f docker/.envs/app.prod.env || { echo "create docker/.envs/app.prod.env from app.prod.env.example"; exit 1; }
+	@test -s docker/.envs/secrets/db_password || { echo "create docker/.envs/secrets/db_password (e.g. openssl rand -hex 24 > docker/.envs/secrets/db_password)"; exit 1; }
 	DOCKER_BUILD_MODE=prod $(DC_PROD) up -d --build
 down:
 	$(DC) down
@@ -20,3 +21,7 @@ types:
 	$(DC) exec -T vite npm run types
 logs:
 	$(DC) logs -f --tail 100
+
+# vulnerability and misconfiguration checks: composer, npm, Dockerfile/compose, secrets, images (see docs/security.md)
+audit:
+	@sh scripts/audit.sh

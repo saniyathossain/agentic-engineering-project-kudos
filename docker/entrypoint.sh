@@ -56,5 +56,8 @@ if [ "${RUN_MIGRATIONS:-0}" = "1" ]; then
   until php artisan migrate --force 2>/dev/null; do echo "waiting for db..."; sleep 2; done
   php artisan db:seed --force || echo "seed skipped"
 fi
+# compiled views embed the Blade directives of the installed packages: drop them so an upgrade cannot leave stale ones
+php artisan view:clear >/dev/null
+php artisan lang:export-status >/dev/null
 [ -L public/storage ] || php artisan storage:link
 exec "$@"

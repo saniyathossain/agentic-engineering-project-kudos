@@ -1,34 +1,54 @@
 # Production override: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d  (or `make prod`)
-# Immutable images, no bind mounts, non-root, read-only rootfs, dropped capabilities, resource caps,
-# loopback-only published port (put a TLS proxy / load balancer in front), no vite, no Postgres port.
-# Secrets live in docker/.envs/app.prod.env (git-ignored); see app.prod.env.example.
+#
+# Hardening in this file:
+# - immutable images, no bind mounts, non-root users, read-only root filesystems, tmpfs with noexec/nosuid/nodev
+# - every capability dropped for every service, no-new-privileges, init process; the database image starts as the
+#   postgres user directly (no root, no gosu)
+# - CPU, memory, swap and pids limits on every service
+# - networks split by purpose: `edge` (nginx <-> app), `egress` (outbound calls such as Stripe), and `data`, which is
+#   internal: the database has no route to the outside and nothing but the app containers can reach it
+# - the database password is a Docker secret (file), never an environment variable; any NAME_FILE variable is read
+#   into NAME by entrypoint.prod.sh, so STRIPE_SECRET_FILE etc. work the same way
+# - only the edge publishes a port, on loopback (put a TLS proxy or load balancer in front); Postgres is not published
+#
+# Secrets: docker/.envs/secrets/db_password (git-ignored) and docker/.envs/app.prod.env (git-ignored).
 x-prod: &prod
   image: ${KUDOS_IMAGE:-kudos-app:prod}
   build:
     context: ../
     dockerfile: docker/Dockerfile
     target: prod
-  env_file: .envs/app.prod.env
+  env_file:
+    - .envs/app.prod.env
+    - .envs/outage.env
   volumes: !override
     - storage:/app/storage
   read_only: true
+  init: true
   tmpfs:
-    - /tmp
-    - /app/bootstrap/cache:uid=82,gid=82,mode=0755   # config/route caches are built at boot from the container env
+    - /tmp:noexec,nosuid,nodev,size=64m
+    - /app/bootstrap/cache:uid=82,gid=82,mode=0755,noexec,nosuid,nodev,size=16m   # config/route caches are built at boot from the container env
   cap_drop: [ALL]
   security_opt: ["no-new-privileges:true"]
+  secrets: [db_password]
+  networks: !override [egress, data]
   restart: always
   logging:
     driver: local
     options: { max-size: 50m, max-file: "10" }
+
+x-prod-env: &prod-env
+  DB_PASSWORD_FILE: /run/secrets/db_password
 
 services:
   app:
     <<: *prod
     ports: !reset []
     environment: !override
+      <<: *prod-env
       APP_ROLE: web
     expose: ["9000"]
+    networks: !override [edge, egress, data]
     mem_limit: ${APP_MEM_LIMIT:-512m}
     memswap_limit: ${APP_MEM_LIMIT:-512m}
     cpus: ${APP_CPUS:-1.5}
@@ -49,26 +69,34 @@ services:
       app: { condition: service_healthy }
     ports:
       - "127.0.0.1:${APP_PORT:-8010}:8080"
+    env_file: [.envs/outage.env]
     read_only: true
-    tmpfs: [/tmp, /var/cache/nginx, /run]
+    init: true
+    # the unprivileged nginx image runs as uid 101 and needs no capabilities at all; envsubst renders the template into conf.d at start
+    tmpfs:
+      - /tmp:noexec,nosuid,nodev,size=64m
+      - /etc/nginx/conf.d:uid=101,gid=101,mode=0755,noexec,nosuid,nodev,size=1m
     cap_drop: [ALL]
-    cap_add: [CHOWN, SETUID, SETGID]
     security_opt: ["no-new-privileges:true"]
     mem_limit: 128m
     memswap_limit: 128m
     cpus: 0.5
     pids_limit: 128
-    networks: [kudos-net]
+    networks: !override [edge]
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/healthz >/dev/null || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
     restart: always
+    logging:
+      driver: local
+      options: { max-size: 20m, max-file: "5" }
 
   queue:
     <<: *prod
     environment: !override
+      <<: *prod-env
       APP_ROLE: queue
     command: ["php", "artisan", "queue:work", "--tries=3", "--sleep=2", "--max-time=3600"]
     mem_limit: 256m
@@ -85,6 +113,7 @@ services:
   scheduler:
     <<: *prod
     environment: !override
+      <<: *prod-env
       APP_ROLE: scheduler
     command: ["php", "artisan", "schedule:work"]
     mem_limit: 128m
@@ -99,15 +128,46 @@ services:
     profiles: ["disabled-in-prod"]
 
   db:
+    image: ${KUDOS_DB_IMAGE:-kudos-db:prod}
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+      target: db
     ports: !reset []
-    env_file: .envs/app.prod.env
+    env_file: !reset []
     environment: !override
       POSTGRES_DB: ${DB_DATABASE:-kudos}
+      POSTGRES_USER: ${DB_USERNAME:-kudos}
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    secrets: [db_password]
+    networks: !override [data]
+    read_only: true
+    init: true
+    tmpfs:
+      - /tmp:noexec,nosuid,nodev,size=64m
+      - /run/postgresql:uid=70,gid=70,mode=0755,noexec,nosuid,nodev,size=8m
+    # runs as the postgres user from the start (see the `db` target), so it needs no capabilities at all
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
     mem_limit: ${DB_MEM_LIMIT:-512m}
     memswap_limit: ${DB_MEM_LIMIT:-512m}
     cpus: ${DB_CPUS:-1.0}
     pids_limit: 200
     restart: always
+    logging:
+      driver: local
+      options: { max-size: 20m, max-file: "5" }
+
+networks:
+  edge: {}
+  egress: {}
+  data:
+    internal: true
+
+secrets:
+  db_password:
+    file: ./.envs/secrets/db_password
 
 volumes:
   storage: {}
